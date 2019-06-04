@@ -44,4 +44,4 @@ FabCircularMenu(
 
 - [ ] Improve documentation
 - [ ] Add tests
-- [ ] Add examples
+- [x] Add examples
