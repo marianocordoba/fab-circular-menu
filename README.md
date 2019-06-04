@@ -3,6 +3,8 @@
 
 A Flutter package to create a nice circular menu using a Floating Action Button.
 
+Inspired by [Mayur Kshirsagar](https://dribbble.com/mayurksgr)'s great [FAB Microinteraction](https://dribbble.com/shots/4354100-Daily-UI-Challenge-Day-75-FAB-Microinteraction) design.
+
 ##### WARNING! This package is under development and should not be used in production apps.
 
 ![Showcase](https://i.imgur.com/vjAvdoR.gif)
