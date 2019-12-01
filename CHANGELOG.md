@@ -1,3 +1,7 @@
+## 0.1.2
+
+* Fixes multiple tickers error
+
 ## 0.1.1
 
 * Added an example
