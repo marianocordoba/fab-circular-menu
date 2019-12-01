@@ -28,7 +28,7 @@ class FabCircularMenu extends StatefulWidget {
     this.fabOpenIcon = const Icon(Icons.menu),
     this.fabCloseIcon = const Icon(Icons.close),
     this.animationDuration = const Duration(milliseconds: 800)
-  });
+  }) : assert(options != null && options.length > 0);
 
   @override
   _FabCircularMenuState createState() => _FabCircularMenuState();
@@ -44,11 +44,39 @@ class _FabCircularMenuState extends State<FabCircularMenu>
 
   bool animating = false;
   bool open = false;
-  AnimationController controller;
+  AnimationController animationController;
   Animation<double> scaleAnimation;
   Animation scaleCurve;
   Animation<double> rotateAnimation;
   Animation rotateCurve;
+
+  @override
+  void initState() {
+    super.initState();
+
+    animationController = AnimationController(
+      duration: widget.animationDuration,
+      vsync: this
+    );
+
+    scaleCurve = CurvedAnimation(
+      parent: animationController, curve: Interval(0.0, 0.4, curve: Curves.easeInOutCirc)
+    );
+    scaleAnimation = Tween<double>(begin: 0.0, end: 1.0)
+      .animate(scaleCurve)
+      ..addListener(() {
+        setState(() {});
+      });
+
+    rotateCurve = CurvedAnimation(
+      parent: animationController, curve: Interval(0.4, 1.0, curve: Curves.easeInOutCirc)
+    );
+    rotateAnimation = Tween<double>(begin: 1.0, end: 90.0)
+      .animate(rotateCurve)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
 
   @override
   void didChangeDependencies() {
@@ -57,29 +85,13 @@ class _FabCircularMenuState extends State<FabCircularMenu>
     ringDiameter = widget.ringDiameter ?? MediaQuery.of(context).size.width * 1.2;
     ringWidth = widget.ringWidth ?? ringDiameter / 3;
     fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
+  }
 
-    controller = AnimationController(
-        duration: widget.animationDuration,
-        vsync: this
-    );
+  @override
+  void dispose() {
+    animationController?.dispose();
 
-    scaleCurve = CurvedAnimation(
-        parent: controller, curve: Interval(0.0, 0.4, curve: Curves.easeInOutCirc)
-    );
-    scaleAnimation = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(scaleCurve)
-      ..addListener(() {
-        setState(() {});
-      });
-
-    rotateCurve = CurvedAnimation(
-        parent: controller, curve: Interval(0.4, 1.0, curve: Curves.easeInOutCirc)
-    );
-    rotateAnimation = Tween<double>(begin: 1.0, end: 90.0)
-        .animate(rotateCurve)
-      ..addListener(() {
-        setState(() {});
-      });
+    super.dispose();
   }
 
   @override
@@ -132,13 +144,13 @@ class _FabCircularMenuState extends State<FabCircularMenu>
               if (!animating && !open) {
                 animating = true;
                 open = true;
-                controller.forward().then((_) {
+                animationController.forward().then((_) {
                   animating = false;
                 });
               } else if (!animating) {
                 animating = true;
                 open = false;
-                controller.reverse().then((_) {
+                animationController.reverse().then((_) {
                   animating = false;
                 });
               }
