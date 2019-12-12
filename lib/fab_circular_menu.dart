@@ -28,7 +28,8 @@ class FabCircularMenu extends StatefulWidget {
     this.fabOpenIcon = const Icon(Icons.menu),
     this.fabCloseIcon = const Icon(Icons.close),
     this.animationDuration = const Duration(milliseconds: 800)
-  }) : assert(options != null && options.length > 0);
+  }) : assert(child != null),
+       assert(options != null && options.length > 0);
 
   @override
   _FabCircularMenuState createState() => _FabCircularMenuState();
@@ -104,6 +105,7 @@ class _FabCircularMenuState extends State<FabCircularMenu>
       children: <Widget>[
         widget.child,
 
+        // Ring
         Positioned(
           bottom: bottom,
           right: right,
@@ -119,22 +121,27 @@ class _FabCircularMenuState extends State<FabCircularMenu>
           ),
         ),
 
+        // Options
         Positioned(
-          bottom: bottom,
-          right: right,
-            child: Container(
-              width: scaleAnimation.value * ringDiameter,
-              height: scaleAnimation.value * ringDiameter,
-              child: Transform.rotate(
-                angle: -(math.pi / rotateAnimation.value),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: _applyTranslations(widget.options)
+          bottom: bottom - (ringWidth * 0.5),
+          right: right - (ringWidth * 0.5),
+            child: Material(
+              child: Container(
+                width: scaleAnimation.value * ringDiameter + ringWidth,
+                height: scaleAnimation.value * ringDiameter + ringWidth,
+                child: Transform.rotate(
+                  angle: -(math.pi / rotateAnimation.value),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: _applyTranslations(widget.options)
+                  ),
                 ),
               ),
+              color: Colors.transparent,
             ),
         ),
 
+        // FAB
         Padding(
           padding: widget.fabMargin,
           child: FloatingActionButton(
@@ -163,7 +170,7 @@ class _FabCircularMenuState extends State<FabCircularMenu>
 
   List<Widget> _applyTranslations(List<Widget> widgets) {
     return widgets.asMap().map((index, widget) {
-      final double angle = 90.0 / (widgets.length * 2 - 2) * (index * 2);
+      final double angle = widgets.length == 1 ? 45.0 : 90.0 / (widgets.length * 2 - 2) * (index * 2);
       return MapEntry(index, _applyTranslation(angle, widget));
     }).values.toList();
   }
@@ -176,7 +183,11 @@ class _FabCircularMenuState extends State<FabCircularMenu>
             -(ringDiameter / 2) * math.cos(rad),
             -(ringDiameter / 2) * math.sin(rad)
         ),
-      child: widget,
+      child: Transform(
+        child: widget,
+        transform: Matrix4.rotationZ(math.pi / rotateAnimation.value),
+        alignment: FractionalOffset.center,
+      ),
     );
   }
 
