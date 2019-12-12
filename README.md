@@ -1,5 +1,7 @@
 # FAB Circular Menu 
-![Pub](https://img.shields.io/pub/v/fab_circular_menu.svg)
+[![Pub](https://img.shields.io/pub/v/fab_circular_menu.svg)](https://pub.dev/packages/fab_circular_menu)
+[![Pull Requests are welcome](https://img.shields.io/badge/license-MIT-blue)](https://github.com/marianocordoba/fab-circular-menu/blob/master/LICENSE)
+[![Pull Requests are welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](https://github.com/marianocordoba/fab-circular-menu/pulls)
 
 A Flutter package to create a nice circular menu using a Floating Action Button.
 

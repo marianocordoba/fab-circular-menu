@@ -1,3 +1,8 @@
+## 0.1.3
+
+* Bugfixes
+* Improved animation
+
 ## 0.1.2
 
 * Fixes multiple tickers error
