@@ -46,4 +46,4 @@ MaterialApp(
 | fabOpenIcon | Icon | The open icon | `Icon(Icons.menu)`
 | fabCloseIcon | Icon | The close icon | `Icon(Icons.close)`
 | animationDuration | Duration | The animation duration | `Duration(milliseconds: 800)`
-| onDisplayChange | Function | A callback called when the open/close state changes | `void`
+| onDisplayChange | Function | A callback called when the open/close state changes | `Function`
