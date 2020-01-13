@@ -20,7 +20,7 @@ class FabCircularMenu extends StatefulWidget {
   final Duration animationDuration;
   final Function onDisplayChange;
   
-  static _defaultVoidFunc() {}
+  static _defaultVoidFunc([isOpen]) {}
 
   FabCircularMenu({
     @required this.child,
