@@ -1,7 +1,5 @@
 library fab_circular_menu;
 
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:vector_math/vector_math.dart' as vector;
@@ -22,7 +20,7 @@ class FabCircularMenu extends StatefulWidget {
   final Duration animationDuration;
   final Function onDisplayChange;
   
-  static void _defaultVoidFunc(){}
+  static _defaultVoidFunc() {}
 
   FabCircularMenu({
     @required this.child,
