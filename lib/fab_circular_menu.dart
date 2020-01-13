@@ -13,9 +13,14 @@ class FabCircularMenu extends StatefulWidget {
   final double ringWidth;
   final EdgeInsets fabMargin;
   final Color fabColor;
+  final Color fabOpenColor;
+  final Color fabCloseColor;
   final Icon fabOpenIcon;
   final Icon fabCloseIcon;
   final Duration animationDuration;
+  final Function onDisplayChange;
+  
+  static _defaultVoidFunc([isOpen]) {}
 
   FabCircularMenu({
     @required this.child,
@@ -25,9 +30,12 @@ class FabCircularMenu extends StatefulWidget {
     this.ringWidth,
     this.fabMargin = const EdgeInsets.all(24.0),
     this.fabColor,
+    this.fabOpenColor,
+    this.fabCloseColor,
     this.fabOpenIcon = const Icon(Icons.menu),
     this.fabCloseIcon = const Icon(Icons.close),
-    this.animationDuration = const Duration(milliseconds: 800)
+    this.animationDuration = const Duration(milliseconds: 800),
+    this.onDisplayChange = _defaultVoidFunc,
   }) : assert(child != null),
        assert(options != null && options.length > 0);
 
@@ -42,6 +50,8 @@ class _FabCircularMenuState extends State<FabCircularMenu>
   double ringDiameter;
   double ringWidth;
   Color fabColor;
+  Color fabOpenColor;
+  Color fabCloseColor;
 
   bool animating = false;
   bool open = false;
@@ -86,6 +96,8 @@ class _FabCircularMenuState extends State<FabCircularMenu>
     ringDiameter = widget.ringDiameter ?? MediaQuery.of(context).size.width * 1.2;
     ringWidth = widget.ringWidth ?? ringDiameter / 3;
     fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
+    fabOpenColor = widget.fabOpenColor ?? fabColor ?? Theme.of(context).primaryColor;
+    fabCloseColor = widget.fabCloseColor ?? fabColor ?? Theme.of(context).primaryColor;
   }
 
   @override
@@ -146,19 +158,21 @@ class _FabCircularMenuState extends State<FabCircularMenu>
           padding: widget.fabMargin,
           child: FloatingActionButton(
             child: open ? widget.fabCloseIcon : widget.fabOpenIcon,
-            backgroundColor: fabColor,
+            backgroundColor: open ? fabOpenColor : fabCloseColor,
             onPressed: () {
               if (!animating && !open) {
                 animating = true;
                 open = true;
                 animationController.forward().then((_) {
                   animating = false;
+                  widget.onDisplayChange({'isOpen': open});
                 });
               } else if (!animating) {
                 animating = true;
                 open = false;
                 animationController.reverse().then((_) {
                   animating = false;
+                  widget.onDisplayChange({'isOpen': open});
                 });
               }
             }
