@@ -1,3 +1,7 @@
+## 0.1.4
+
+* #7 Add Close Color option and open/close change callback
+
 ## 0.1.3
 
 * Bugfixes

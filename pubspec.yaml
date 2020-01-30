@@ -1,6 +1,5 @@
 name: fab_circular_menu
 description: A Flutter package to create a nice circular menu using a Floating Action Button.
-author: Mariano Córdoba <marianocordoba039@gmail.com>
 homepage: https://github.com/marianocordoba/fab-circular-menu
 version: 0.1.4
 
