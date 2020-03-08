@@ -47,3 +47,4 @@ MaterialApp(
 | fabCloseIcon | Icon | The close icon | `Icon(Icons.close)`
 | animationDuration | Duration | The animation duration | `Duration(milliseconds: 800)`
 | onDisplayChange | Function | A callback called when the open/close state changes | `Function`
+| controller | FabCircularMenuController | A controller for opening or closing the menu | `null`

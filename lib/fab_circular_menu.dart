@@ -19,11 +19,11 @@ class FabCircularMenu extends StatefulWidget {
   final Icon fabCloseIcon;
   final Duration animationDuration;
   final Function onDisplayChange;
+  final FabCircularMenuController controller;
   
   static _defaultVoidFunc([isOpen]) {}
 
   FabCircularMenu({
-    @required this.child,
     @required this.options,
     this.ringColor = Colors.white,
     this.ringDiameter,
@@ -36,6 +36,8 @@ class FabCircularMenu extends StatefulWidget {
     this.fabCloseIcon = const Icon(Icons.close),
     this.animationDuration = const Duration(milliseconds: 800),
     this.onDisplayChange = _defaultVoidFunc,
+    this.controller,
+    @required this.child,
   }) : assert(child != null),
        assert(options != null && options.length > 0);
 
@@ -60,10 +62,20 @@ class _FabCircularMenuState extends State<FabCircularMenu>
   Animation scaleCurve;
   Animation<double> rotateAnimation;
   Animation rotateCurve;
+  FabCircularMenuController controller;
 
   @override
   void initState() {
     super.initState();
+
+    controller = widget.controller ?? FabCircularMenuController();
+    controller.addListener(() {
+      if (controller.isOpen) {
+        _open();
+      } else {
+        _close();
+      }
+    });
 
     animationController = AnimationController(
       duration: widget.animationDuration,
@@ -161,19 +173,9 @@ class _FabCircularMenuState extends State<FabCircularMenu>
             backgroundColor: open ? fabOpenColor : fabCloseColor,
             onPressed: () {
               if (!animating && !open) {
-                animating = true;
-                open = true;
-                animationController.forward().then((_) {
-                  animating = false;
-                  widget.onDisplayChange({'isOpen': open});
-                });
+                _open();
               } else if (!animating) {
-                animating = true;
-                open = false;
-                animationController.reverse().then((_) {
-                  animating = false;
-                  widget.onDisplayChange({'isOpen': open});
-                });
+                _close();
               }
             }
           ),
@@ -182,14 +184,14 @@ class _FabCircularMenuState extends State<FabCircularMenu>
     );
   }
 
-  List<Widget> _applyTranslations(List<Widget> widgets) {
-    return widgets.asMap().map((index, widget) {
-      final double angle = widgets.length == 1 ? 45.0 : 90.0 / (widgets.length * 2 - 2) * (index * 2);
-      return MapEntry(index, _applyTranslation(angle, widget));
+  List<Widget> _applyTranslations(List<Widget> options) {
+    return options.asMap().map((index, option) {
+      final double angle = options.length == 1 ? 45.0 : 90.0 / (options.length * 2 - 2) * (index * 2);
+      return MapEntry(index, _applyTranslation(angle, option));
     }).values.toList();
   }
 
-  Widget _applyTranslation(double angle, Widget widget) {
+  Widget _applyTranslation(double angle, Widget option) {
     final double rad = vector.radians(angle);
     return Transform(
       transform: Matrix4.identity()
@@ -198,15 +200,46 @@ class _FabCircularMenuState extends State<FabCircularMenu>
             -(ringDiameter / 2) * math.sin(rad)
         ),
       child: Transform(
-        child: widget,
+        child: option,
         transform: Matrix4.rotationZ(math.pi / rotateAnimation.value),
         alignment: FractionalOffset.center,
       ),
     );
   }
 
+  void _open () {
+    animating = true;
+    animationController.forward().then((_) {
+      open = true;
+      animating = false;
+      widget.onDisplayChange({ 'isOpen': open });
+    });
+  }
+
+  void _close () {
+    animating = true;
+    animationController.reverse().then((_) {
+      open = false;
+      animating = false;
+      widget.onDisplayChange({ 'isOpen': open });
+    });
+  }
+
 }
 
+class FabCircularMenuController extends ValueNotifier<bool> {
+
+  FabCircularMenuController({ bool isOpen })
+    : super(isOpen ?? false);
+
+  bool get isOpen => value;
+
+  set isOpen (bool newValue) {
+    value = newValue;
+    notifyListeners();
+  }
+
+}
 
 class _RingPainter extends CustomPainter {
 

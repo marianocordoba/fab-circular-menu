@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 
-void main() => runApp(MyApp());
+void main () {
+//  debugPaintPointersEnabled = true;
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = FabCircularMenuController();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -25,8 +31,11 @@ class MyApp extends StatelessWidget {
             ),
           ),
           ringColor: Colors.white30,
+          controller: controller,
           options: <Widget>[
-            IconButton(icon: Icon(Icons.widgets), onPressed: () {}, iconSize: 48.0, color: Colors.white),
+            IconButton(icon: Icon(Icons.widgets), onPressed: () {
+              controller.isOpen = false;
+            }, iconSize: 48.0, color: Colors.white),
             IconButton(icon: Icon(Icons.widgets), onPressed: () {}, iconSize: 48.0, color: Colors.white),
             IconButton(icon: Icon(Icons.widgets), onPressed: () {}, iconSize: 48.0, color: Colors.white),
             IconButton(icon: Icon(Icons.widgets), onPressed: () {}, iconSize: 48.0, color: Colors.white),
