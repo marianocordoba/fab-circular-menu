@@ -1,3 +1,7 @@
+## 0.1.5
+
+* #4 Added FabCircularMenuController to open/close the menu programatically
+
 ## 0.1.4
 
 * #7 Add Close Color option and open/close change callback
