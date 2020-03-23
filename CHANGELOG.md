@@ -1,3 +1,15 @@
+## 1.0.0
+
+* Added `alignment` property, allowing to align the FAB in the screen (See #5)
+* Fixes animation errors in landscape orientation (See #9)
+* Added the ability to access the state to open/close the menu programatically
+
+#### **BREAKING**
+* Removed `child` property
+* `options` renamed to `children`
+* Removed `controller` property
+* `onDisplayChanged` signature changed to `void Function (bool isOpen)`
+
 ## 0.1.5
 
 * #4 Added FabCircularMenuController to open/close the menu programatically

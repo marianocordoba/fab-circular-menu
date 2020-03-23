@@ -1,50 +1,106 @@
 # FAB Circular Menu 
 [![Pub](https://img.shields.io/pub/v/fab_circular_menu.svg)](https://pub.dev/packages/fab_circular_menu)
 [![Pull Requests are welcome](https://img.shields.io/badge/license-MIT-blue)](https://github.com/marianocordoba/fab-circular-menu/blob/master/LICENSE)
-[![Pull Requests are welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](https://github.com/marianocordoba/fab-circular-menu/pulls)
 [![Codemagic build status](https://api.codemagic.io/apps/5cf6ad31434563000a9534d5/5cf6ad31434563000a9534d4/status_badge.svg)](https://codemagic.io/apps/5cf6ad31434563000a9534d5/5cf6ad31434563000a9534d4/latest_build)
 
 A Flutter package to create a nice circular menu using a Floating Action Button.
 
 Inspired by [Mayur Kshirsagar](https://dribbble.com/mayurksgr)'s great [FAB Microinteraction](https://dribbble.com/shots/4354100-Daily-UI-Challenge-Day-75-FAB-Microinteraction) design.
 
-![Showcase](https://i.imgur.com/vjAvdoR.gif)
+![Showcase](https://i.imgur.com/ErrNnAw.gif)
 
-## Getting started
+## Installation
 
-Wrap your content with `FabCircularMenu` and set your desired `options`:
+Just add `fab_circular_menu` to your [pubspec.yml](https://flutter.io/using-packages/) file
 
-
-```dart
-MaterialApp(
-  home: Scaffold(
-    body: FabCircularMenu(
-      child: Placeholder(), // Replace this with your content
-      options: <Widget>[
-        IconButton(icon: Icon(Icons.home), onPressed: () {
-          print('Pressed!');
-        })
-      ]
-    )
-  )
-)
+```yml
+dependencies:
+  fab_circular_menu: ^1.0.0
 ```
 
-### Options
+## Example
 
-| Property | Type | Description | Default | Caveat |
-|----------|------|-------------|---------|------------|
-| <font color="ff0000">`required`</font> child | Widget | The child of this widget | - 
-| <font color="ff0000">`required`</font> options | List<Widget> | The available options of the menu | -
-| ringColor | Color | The color of the ring | `Colors.white`
-| ringDiameter | double | The diameter of the ring | `screenWidth * 1.2`
-| ringWidth | double | The width of the ring | `ringDiameter / 3`
-| fabMargin | EdgeInsets | The margin around the FAB | `EdgeInsets.all(24.0)`
-| fabColor | Color | The color of the FAB | `primaryColor` |
-| fabOpenColor | Color | The color of the FAB when opened | `primaryColor` | Will override `fabColor` for open state
-| fabCloseColor | Color | The color of the FAB when closed | `primaryColor` | Will override `fabColor` for close state
-| fabOpenIcon | Icon | The open icon | `Icon(Icons.menu)`
-| fabCloseIcon | Icon | The close icon | `Icon(Icons.close)`
-| animationDuration | Duration | The animation duration | `Duration(milliseconds: 800)`
-| onDisplayChange | Function | A callback called when the open/close state changes | `Function`
-| controller | FabCircularMenuController | A controller for opening or closing the menu | `null`
+```dart
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Placeholder(),
+        floatingActionButton: FabCircularMenu(
+          children: <Widget>[
+            IconButton(icon: Icon(Icons.home), onPressed: () {
+              print('Home');
+            }),
+            IconButton(icon: Icon(Icons.favorite), onPressed: () {
+              print('Favorite');
+            })
+          ]
+        )
+      )
+    );
+  }
+}
+```
+
+You can check for a more complete example in the [example](https://github.com/marianocordoba/fab-circular-menu/tree/master/example) directory.
+
+## Customize
+
+You can customize the widget appareance using the following properties:
+
+| Property  | Description | Default |
+|----------|-------------|---------|
+| alignment | Sets the widget alignment | `Alignment.bottomRight` |
+| ringColor | Sets the ring color | `accentColor` |
+| ringDiameter | Sets de ring diameter | `screenWidth * 1.25` (portrait) <br> `screenHeight * 1.25` (landscape) |
+| ringWidth | Sets the ring width | `ringDiameter * 0.3` |
+| fabSize | Sets the FAB size | `64.0` |
+| fabElevation | Sets the elevation for the FAB | `8.0` |
+| fabColor | Sets the FAB color | `primaryColor` |
+| fabOpenColor | Sets the FAB color while the menu is open. This property takes precedence over `fabColor` | - |
+| fabCloseColor | Sets the FAB color while the menu is closed. This property takes precedence over `fabColor` | - |
+| fabOpenIcon | Sets the FAB icon while the menu is open | `Icon(Icons.menu)` |
+| fabCloseIcon | Sets the FAB icon while the menu is closed | `Icon(Icons.close)` |
+| fabMargin | Sets the widget margin | `EdgeInsets.all(16.0)` |
+| animationDuration | Changes the animation duration | `Duration(milliseconds: 800)` |
+| animationCurve | Allows you to modify de animation curve | `Curves.easeInOutCirc` |
+| onDisplayChange | This callback is called every time the menu is opened or closed, passing the current state as a parameter. | - |
+
+## Handling the menu programmatically
+
+It is possible to handle the menu programatically by using a [key](https://api.flutter.dev/flutter/foundation/Key-class.html). Just create a key and set it in the `key` property of the `FabCircularMenu`, then use the key to get the current state and open, close or check the status of the menu.
+
+```dart
+class MyApp extends StatelessWidget {
+  final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: RaisedButton(
+          onPressed: () {
+            if (fabKey.currentState.isOpen) {
+              fabKey.currentState.close();
+            } else {
+              fabKey.currentState.open();
+            }
+          },
+          child: Text('Toggle menu')
+        ),
+        floatingActionButton: FabCircularMenu(
+          key: fabKey,
+          children: <Widget>[
+            // ...
+          ]
+        )
+      )
+    );
+  }
+}
+```
+
+## Contributing
+
+I will be very happy if you contribute to this project, please submit a PR 😁

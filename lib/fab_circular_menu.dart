@@ -1,267 +1,306 @@
-library fab_circular_menu;
-
+import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:vector_math/vector_math.dart' as vector;
+
+typedef DisplayChange = void Function (bool isOpen);
 
 class FabCircularMenu extends StatefulWidget {
 
-  final Widget child;
-  final List<Widget> options;
+  final List<Widget> children;
+  final Alignment alignment;
   final Color ringColor;
   final double ringDiameter;
   final double ringWidth;
-  final EdgeInsets fabMargin;
+  final double fabSize;
+  final double fabElevation;
   final Color fabColor;
   final Color fabOpenColor;
   final Color fabCloseColor;
   final Icon fabOpenIcon;
   final Icon fabCloseIcon;
+  final EdgeInsets fabMargin;
   final Duration animationDuration;
-  final Function onDisplayChange;
-  final FabCircularMenuController controller;
-  
-  static _defaultVoidFunc([isOpen]) {}
+  final Curve animationCurve;
+  final DisplayChange onDisplayChange;
 
   FabCircularMenu({
-    @required this.options,
-    this.ringColor = Colors.white,
+    Key key,
+    this.alignment = Alignment.bottomRight,
+    this.ringColor,
     this.ringDiameter,
     this.ringWidth,
-    this.fabMargin = const EdgeInsets.all(24.0),
+    this.fabSize = 64.0,
+    this.fabElevation = 8.0,
     this.fabColor,
     this.fabOpenColor,
     this.fabCloseColor,
     this.fabOpenIcon = const Icon(Icons.menu),
     this.fabCloseIcon = const Icon(Icons.close),
+    this.fabMargin = const EdgeInsets.all(16.0),
     this.animationDuration = const Duration(milliseconds: 800),
-    this.onDisplayChange = _defaultVoidFunc,
-    this.controller,
-    @required this.child,
-  }) : assert(child != null),
-       assert(options != null && options.length > 0);
+    this.animationCurve = Curves.easeInOutCirc,
+    this.onDisplayChange,
+    @required this.children
+  }) :  assert(alignment != Alignment.center),
+        assert(children != null),
+        assert(children.length >= 2),
+        super(key: key);
 
   @override
-  _FabCircularMenuState createState() => _FabCircularMenuState();
-
+  FabCircularMenuState createState() => FabCircularMenuState();
 }
 
-class _FabCircularMenuState extends State<FabCircularMenu>
-  with SingleTickerProviderStateMixin {
+class FabCircularMenuState extends State<FabCircularMenu>
+    with SingleTickerProviderStateMixin {
 
-  double ringDiameter;
-  double ringWidth;
-  Color fabColor;
-  Color fabOpenColor;
-  Color fabCloseColor;
+  double _screenWidth;
+  double _screenHeight;
+  double _marginH;
+  double _marginV;
+  double _directionX;
+  double _directionY;
+  double _translationX;
+  double _translationY;
 
-  bool animating = false;
-  bool open = false;
-  AnimationController animationController;
-  Animation<double> scaleAnimation;
-  Animation scaleCurve;
-  Animation<double> rotateAnimation;
-  Animation rotateCurve;
-  FabCircularMenuController controller;
+  Color _ringColor;
+  double _ringDiameter;
+  double _ringWidth;
+  Color _fabColor;
+  Color _fabOpenColor;
+  Color _fabCloseColor;
+
+  AnimationController _animationController;
+  Animation<double> _scaleAnimation;
+  Animation _scaleCurve;
+  Animation<double> _rotateAnimation;
+  Animation _rotateCurve;
+  Animation<Color> _colorAnimation;
+  Animation _colorCurve;
+
+  bool _isOpen = false;
+  bool _isAnimating = false;
 
   @override
   void initState() {
     super.initState();
 
-    controller = widget.controller ?? FabCircularMenuController();
-    controller.addListener(() {
-      if (controller.isOpen) {
-        _open();
-      } else {
-        _close();
-      }
-    });
-
-    animationController = AnimationController(
-      duration: widget.animationDuration,
-      vsync: this
+    _animationController = AnimationController(
+        duration: widget.animationDuration,
+        vsync: this
     );
 
-    scaleCurve = CurvedAnimation(
-      parent: animationController, curve: Interval(0.0, 0.4, curve: Curves.easeInOutCirc)
+    _scaleCurve = CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.0, 0.4, curve: widget.animationCurve)
     );
-    scaleAnimation = Tween<double>(begin: 0.0, end: 1.0)
-      .animate(scaleCurve)
+    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0)
+      .animate(_scaleCurve)
       ..addListener(() {
         setState(() {});
       });
 
-    rotateCurve = CurvedAnimation(
-      parent: animationController, curve: Interval(0.4, 1.0, curve: Curves.easeInOutCirc)
+    _rotateCurve = CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.4, 1.0, curve: widget.animationCurve)
     );
-    rotateAnimation = Tween<double>(begin: 1.0, end: 90.0)
-      .animate(rotateCurve)
+    _rotateAnimation = Tween<double>(begin: 0.5, end: 1.0)
+      .animate(_rotateCurve)
       ..addListener(() {
         setState(() {});
       });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    ringDiameter = widget.ringDiameter ?? MediaQuery.of(context).size.width * 1.2;
-    ringWidth = widget.ringWidth ?? ringDiameter / 3;
-    fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
-    fabOpenColor = widget.fabOpenColor ?? fabColor ?? Theme.of(context).primaryColor;
-    fabCloseColor = widget.fabCloseColor ?? fabColor ?? Theme.of(context).primaryColor;
-  }
-
-  @override
-  void dispose() {
-    animationController?.dispose();
-
-    super.dispose();
+    _calculateProps();
   }
 
   @override
   Widget build(BuildContext context) {
-    final double bottom = -(scaleAnimation.value * ringDiameter / 2 - 40.0 - (widget.fabMargin.bottom / 2));
-    final double right = -(scaleAnimation.value * ringDiameter / 2 - 40.0 - (widget.fabMargin.right / 2));
+    // This makes the widget able to correctly redraw on
+    // hot reload while keeping performance in production
+    if (!kReleaseMode) {
+      _calculateProps();
+    }
 
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: <Widget>[
-        widget.child,
-
-        // Ring
-        Positioned(
-          bottom: bottom,
-          right: right,
-          child: Container(
-            width: scaleAnimation.value * ringDiameter,
-            height: scaleAnimation.value * ringDiameter,
-            child: CustomPaint(
-              foregroundPainter: _RingPainter(
-                ringColor: widget.ringColor,
-                ringWidth: scaleAnimation.value * ringWidth
-              ),
-            ),
-          ),
-        ),
-
-        // Options
-        Positioned(
-          bottom: bottom - (ringWidth * 0.5),
-          right: right - (ringWidth * 0.5),
-            child: Material(
+    return Container(
+      margin: widget.fabMargin,
+      // Removes the default FAB margin
+      transform: Matrix4.translationValues(16.0, 16.0, 0.0),
+      child: Stack(
+        alignment: widget.alignment,
+        children: <Widget>[
+          // Ring
+          Transform(
+            transform: Matrix4
+                .translationValues(_translationX, _translationY, 0.0)
+              ..scale(_scaleAnimation.value),
+            alignment: FractionalOffset.center,
+            child: OverflowBox(
+              maxWidth: _ringDiameter,
+              maxHeight: _ringDiameter,
               child: Container(
-                width: scaleAnimation.value * ringDiameter + ringWidth,
-                height: scaleAnimation.value * ringDiameter + ringWidth,
-                child: Transform.rotate(
-                  angle: -(math.pi / rotateAnimation.value),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: _applyTranslations(widget.options)
+                width: _ringDiameter,
+                height: _ringDiameter,
+                child: CustomPaint(
+                  painter: _RingPainter(
+                      width: _ringWidth,
+                      color: _ringColor
                   ),
+                  child: _scaleAnimation.value == 1.0 ? Transform.rotate(
+                    angle: (2 * pi) * _rotateAnimation.value * _directionX * _directionY,
+                    child: Container(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: widget.children.asMap().map((index, child) =>
+                            MapEntry(index, _applyTransformations(child, index))
+                        ).values.toList(),
+                      ),
+                    ),
+                  ) : Container(),
                 ),
               ),
-              color: Colors.transparent,
             ),
-        ),
-
-        // FAB
-        Padding(
-          padding: widget.fabMargin,
-          child: FloatingActionButton(
-            child: open ? widget.fabCloseIcon : widget.fabOpenIcon,
-            backgroundColor: open ? fabOpenColor : fabCloseColor,
-            onPressed: () {
-              if (!animating && !open) {
-                _open();
-              } else if (!animating) {
-                _close();
-              }
-            }
           ),
-        )
-      ],
-    );
-  }
 
-  List<Widget> _applyTranslations(List<Widget> options) {
-    return options.asMap().map((index, option) {
-      final double angle = options.length == 1 ? 45.0 : 90.0 / (options.length * 2 - 2) * (index * 2);
-      return MapEntry(index, _applyTranslation(angle, option));
-    }).values.toList();
-  }
+          // FAB
+          Container(
+            width: widget.fabSize,
+            height: widget.fabSize,
+            child: RawMaterialButton(
+              fillColor: _colorAnimation.value,
+              shape: CircleBorder(),
+              elevation: widget.fabElevation,
+              onPressed: () {
+                if (_isAnimating) return;
 
-  Widget _applyTranslation(double angle, Widget option) {
-    final double rad = vector.radians(angle);
-    return Transform(
-      transform: Matrix4.identity()
-        ..translate(
-            -(ringDiameter / 2) * math.cos(rad),
-            -(ringDiameter / 2) * math.sin(rad)
-        ),
-      child: Transform(
-        child: option,
-        transform: Matrix4.rotationZ(math.pi / rotateAnimation.value),
-        alignment: FractionalOffset.center,
+                if (_isOpen) {
+                  close();
+                } else {
+                  open();
+                }
+              },
+              child: Center(
+                  child: _scaleAnimation.value == 1.0 ? widget.fabCloseIcon : widget.fabOpenIcon
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  void _open () {
-    animating = true;
-    animationController.forward().then((_) {
-      open = true;
-      animating = false;
-      widget.onDisplayChange({ 'isOpen': open });
+  Widget _applyTransformations (Widget child, int index) {
+    double angleFix = 0.0;
+    if (widget.alignment.x == 0) {
+      angleFix = 45.0 * _directionY.abs();
+    } else if (widget.alignment.y == 0) {
+      angleFix = -45.0 * _directionX.abs();
+    }
+
+    final angle = vector.radians(90.0 / (widget.children.length - 1) * index + angleFix);
+
+    return Transform(
+        transform: Matrix4
+            .translationValues(
+            (-(_ringDiameter / 2) * cos(angle) + (_ringWidth / 2 * cos(angle))) * _directionX,
+            (-(_ringDiameter / 2) * sin(angle) + (_ringWidth / 2 * sin(angle))) * _directionY,
+            0.0
+        ),
+        alignment: FractionalOffset.center,
+        child: Material(
+          color: Colors.transparent,
+          child: child,
+        )
+    );
+  }
+
+  void _calculateProps () {
+    _ringColor = widget.ringColor ?? Theme.of(context).accentColor;
+    _fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
+    _fabOpenColor = widget.fabOpenColor ?? _fabColor;
+    _fabCloseColor = widget.fabCloseColor ?? _fabColor;
+    _screenWidth = MediaQuery.of(context).size.width;
+    _screenHeight = MediaQuery.of(context).size.height;
+    _ringDiameter = widget.ringDiameter ?? min(_screenWidth, _screenHeight) * 1.25;
+    _ringWidth = widget.ringWidth ?? _ringDiameter * 0.3;
+    _marginH = (widget.fabMargin.right + widget.fabMargin.left) / 2;
+    _marginV = (widget.fabMargin.top + widget.fabMargin.bottom) / 2;
+    _directionX = widget.alignment.x == 0 ? 1 : widget.alignment.x;
+    _directionY = widget.alignment.y == 0 ? 1 : widget.alignment.y;
+    _translationX = ((_screenWidth - widget.fabSize) / 2 - _marginH) * widget.alignment.x;
+    _translationY = ((_screenHeight - widget.fabSize) / 2 - _marginV) * widget.alignment.y;
+
+    if (_colorAnimation == null || !kReleaseMode) {
+      _colorCurve = CurvedAnimation(
+          parent: _animationController,
+          curve: Interval(0.0, 0.4, curve: widget.animationCurve)
+      );
+      _colorAnimation = ColorTween(begin: _fabCloseColor, end: _fabOpenColor)
+          .animate(_colorCurve)
+        ..addListener(() {
+          setState(() {});
+        });
+    }
+  }
+
+  void open () {
+    _isAnimating = true;
+    _animationController.forward().then((_) {
+      _isAnimating = false;
+      _isOpen = true;
+      if (widget.onDisplayChange != null) {
+        widget.onDisplayChange(true);
+      }
     });
   }
 
-  void _close () {
-    animating = true;
-    animationController.reverse().then((_) {
-      open = false;
-      animating = false;
-      widget.onDisplayChange({ 'isOpen': open });
+  void close () {
+    _isAnimating = true;
+    _animationController.reverse().then((_) {
+      _isAnimating = false;
+      _isOpen = false;
+      if (widget.onDisplayChange != null) {
+        widget.onDisplayChange(false);
+      }
     });
   }
 
-}
-
-class FabCircularMenuController extends ValueNotifier<bool> {
-
-  FabCircularMenuController({ bool isOpen })
-    : super(isOpen ?? false);
-
-  bool get isOpen => value;
-
-  set isOpen (bool newValue) {
-    value = newValue;
-    notifyListeners();
-  }
-
+  bool get isOpen => _isOpen;
 }
 
 class _RingPainter extends CustomPainter {
 
-  final Color ringColor;
-  final double ringWidth;
+  final double width;
+  final Color color;
 
   _RingPainter({
-    @required this.ringColor,
-    @required this.ringWidth
+    @required this.width,
+    this.color
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = ringColor
-      ..strokeCap = StrokeCap.round
+    final paint = Paint()
+      ..color = color ?? Colors.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = ringWidth;
+      ..strokeWidth = size.width < width ? size.width : width;
 
-    Offset center = Offset(size.width / 2, size.height / 2);
-
-    canvas.drawCircle(center, size.width / 2, paint);
+    canvas.drawArc(
+        Rect.fromLTWH(width / 2, width / 2, size.width - width, size.height - width),
+        0.0,
+        2 * pi,
+        false,
+        paint
+    );
   }
 
   @override
