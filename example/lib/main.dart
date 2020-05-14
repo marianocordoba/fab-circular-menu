@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 
-void main () {
+void main() {
   runApp(MyApp());
 }
 
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
             ringWidth: 150.0,
             fabSize: 64.0,
             fabElevation: 8.0,
-            
+            fabIconBorder: CircleBorder(),
             // Also can use specific color based on wether
             // the menu is open or not:
             // fabOpenColor: Colors.white
@@ -98,12 +98,12 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-  
-  void _showSnackBar (BuildContext context, String message) {
+
+  void _showSnackBar(BuildContext context, String message) {
     Scaffold.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
-          duration: const Duration(milliseconds: 1000),
+      content: Text(message),
+      duration: const Duration(milliseconds: 1000),
         )
     );
   }
