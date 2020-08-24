@@ -17,8 +17,8 @@ class FabCircularMenu extends StatefulWidget {
   final Color fabColor;
   final Color fabOpenColor;
   final Color fabCloseColor;
-  final Icon fabOpenIcon;
-  final Icon fabCloseIcon;
+  final Widget fabOpenIcon;
+  final Widget fabCloseIcon;
   final EdgeInsets fabMargin;
   final Duration animationDuration;
   final Curve animationCurve;
