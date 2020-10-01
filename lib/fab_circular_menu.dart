@@ -19,30 +19,32 @@ class FabCircularMenu extends StatefulWidget {
   final Color fabCloseColor;
   final Widget fabOpenIcon;
   final Widget fabCloseIcon;
+  final ShapeBorder fabIconBorder;
   final EdgeInsets fabMargin;
   final Duration animationDuration;
   final Curve animationCurve;
   final DisplayChange onDisplayChange;
 
-  FabCircularMenu({
-    Key key,
-    this.alignment = Alignment.bottomRight,
-    this.ringColor,
-    this.ringDiameter,
-    this.ringWidth,
-    this.fabSize = 64.0,
-    this.fabElevation = 8.0,
-    this.fabColor,
-    this.fabOpenColor,
-    this.fabCloseColor,
-    this.fabOpenIcon = const Icon(Icons.menu),
-    this.fabCloseIcon = const Icon(Icons.close),
-    this.fabMargin = const EdgeInsets.all(16.0),
-    this.animationDuration = const Duration(milliseconds: 800),
-    this.animationCurve = Curves.easeInOutCirc,
-    this.onDisplayChange,
-    @required this.children
-  }) :  assert(alignment != Alignment.center),
+  FabCircularMenu(
+      {Key key,
+      this.alignment = Alignment.bottomRight,
+      this.ringColor,
+      this.ringDiameter,
+      this.ringWidth,
+      this.fabSize = 64.0,
+      this.fabElevation = 8.0,
+      this.fabColor,
+      this.fabOpenColor,
+      this.fabCloseColor,
+      this.fabIconBorder,
+      this.fabOpenIcon = const Icon(Icons.menu),
+      this.fabCloseIcon = const Icon(Icons.close),
+      this.fabMargin = const EdgeInsets.all(16.0),
+      this.animationDuration = const Duration(milliseconds: 800),
+      this.animationCurve = Curves.easeInOutCirc,
+      this.onDisplayChange,
+      @required this.children})
+      : assert(alignment != Alignment.center),
         assert(children != null),
         assert(children.length >= 2),
         super(key: key);
@@ -69,6 +71,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   Color _fabColor;
   Color _fabOpenColor;
   Color _fabCloseColor;
+  ShapeBorder _fabIconBorder;
 
   AnimationController _animationController;
   Animation<double> _scaleAnimation;
@@ -177,7 +180,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
             height: widget.fabSize,
             child: RawMaterialButton(
               fillColor: _colorAnimation.value,
-              shape: CircleBorder(),
+              shape: _fabIconBorder,
               elevation: widget.fabElevation,
               onPressed: () {
                 if (_isAnimating) return;
@@ -228,6 +231,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
     _fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
     _fabOpenColor = widget.fabOpenColor ?? _fabColor;
     _fabCloseColor = widget.fabCloseColor ?? _fabColor;
+    _fabIconBorder = widget.fabIconBorder ?? CircleBorder();
     _screenWidth = MediaQuery.of(context).size.width;
     _screenHeight = MediaQuery.of(context).size.height;
     _ringDiameter = widget.ringDiameter ?? min(_screenWidth, _screenHeight) * 1.25;
