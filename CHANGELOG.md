@@ -1,3 +1,7 @@
+## 1.0.1
+* Fixes bug with alignment
+* Added the posibility to modify the FAB border
+
 ## 1.0.0
 
 * Added `alignment` property, allowing to align the FAB in the screen (See #5)
