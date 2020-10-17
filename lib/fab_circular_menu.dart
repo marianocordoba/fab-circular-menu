@@ -17,6 +17,7 @@ class FabCircularMenu extends StatefulWidget {
   final Color fabOpenColor;
   final Color fabCloseColor;
   final AnimatedIconData icon;
+  final Color iconColor;
   final ShapeBorder fabIconBorder;
   final EdgeInsets fabMargin;
   final Duration animationDuration;
@@ -35,6 +36,7 @@ class FabCircularMenu extends StatefulWidget {
       this.fabOpenColor,
       this.fabCloseColor,
       this.fabIconBorder,
+      this.iconColor,
       this.icon = AnimatedIcons.menu_close,
       this.fabMargin = const EdgeInsets.all(16.0),
       this.animationDuration = const Duration(milliseconds: 800),
@@ -67,6 +69,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   Color _fabOpenColor;
   Color _fabCloseColor;
   ShapeBorder _fabIconBorder;
+  Color _iconColor;
 
   AnimationController _animationController;
   Animation<double> _scaleAnimation;
@@ -186,8 +189,10 @@ class FabCircularMenuState extends State<FabCircularMenu>
                 }
               },
               child: Center(
-                child:
-                    AnimatedIcon(icon: widget.icon, progress: _scaleAnimation),
+                child: AnimatedIcon(
+                    icon: widget.icon,
+                    progress: _scaleAnimation,
+                    color: _iconColor),
               ),
             ),
           ),
@@ -226,6 +231,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   void _calculateProps() {
     _ringColor = widget.ringColor ?? Theme.of(context).accentColor;
     _fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
+    _iconColor = widget.iconColor ?? Theme.of(context).accentIconTheme.color;
     _fabOpenColor = widget.fabOpenColor ?? _fabColor;
     _fabCloseColor = widget.fabCloseColor ?? _fabColor;
     _fabIconBorder = widget.fabIconBorder ?? CircleBorder();
