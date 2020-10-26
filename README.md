@@ -60,6 +60,7 @@ You can customize the widget appareance using the following properties:
 | fabColor | Sets the FAB color | `primaryColor` |
 | fabOpenColor | Sets the FAB color while the menu is open. This property takes precedence over `fabColor` | - |
 | fabCloseColor | Sets the FAB color while the menu is closed. This property takes precedence over `fabColor` | - |
+| fabChild | Sets the child inside the FAB. This property takes precedence over `fabOpenicon` and `fabCloseIcon` | - |
 | fabOpenIcon | Sets the FAB icon while the menu is open | `Icon(Icons.menu)` |
 | fabCloseIcon | Sets the FAB icon while the menu is closed | `Icon(Icons.close)` |
 | fabMargin | Sets the widget margin | `EdgeInsets.all(16.0)` |
