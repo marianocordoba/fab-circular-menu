@@ -16,6 +16,7 @@ class FabCircularMenu extends StatefulWidget {
   final Color fabColor;
   final Color fabOpenColor;
   final Color fabCloseColor;
+  final Widget fabChild;
   final Widget fabOpenIcon;
   final Widget fabCloseIcon;
   final ShapeBorder fabIconBorder;
@@ -36,8 +37,9 @@ class FabCircularMenu extends StatefulWidget {
       this.fabOpenColor,
       this.fabCloseColor,
       this.fabIconBorder,
-      this.fabOpenIcon = const Icon(Icons.menu),
-      this.fabCloseIcon = const Icon(Icons.close),
+      this.fabChild,
+      this.fabOpenIcon,
+      this.fabCloseIcon,
       this.fabMargin = const EdgeInsets.all(16.0),
       this.animationDuration = const Duration(milliseconds: 800),
       this.animationCurve = Curves.easeInOutCirc,
@@ -188,9 +190,11 @@ class FabCircularMenuState extends State<FabCircularMenu>
                 }
               },
               child: Center(
-                  child: _scaleAnimation.value == 1.0
-                      ? widget.fabCloseIcon
-                      : widget.fabOpenIcon),
+                  child: widget.fabChild == null
+                      ? (_scaleAnimation.value == 1.0
+                          ? widget.fabCloseIcon
+                          : widget.fabOpenIcon)
+                      : widget.fabChild),
             ),
           ),
         ],
