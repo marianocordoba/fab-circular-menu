@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vector;
@@ -35,6 +36,7 @@ class FabCircularMenu extends StatefulWidget {
       this.fabElevation = 8.0,
       this.fabColor,
       this.fabOpenColor,
+      this.removeDefaultFabMargin = true,
       this.fabCloseColor,
       this.fabIconBorder,
       this.fabChild,
@@ -52,8 +54,7 @@ class FabCircularMenu extends StatefulWidget {
   FabCircularMenuState createState() => FabCircularMenuState();
 }
 
-class FabCircularMenuState extends State<FabCircularMenu>
-    with SingleTickerProviderStateMixin {
+class FabCircularMenuState extends State<FabCircularMenu> with SingleTickerProviderStateMixin {
   late double _screenWidth;
   late double _screenHeight;
   late double _marginH;
@@ -86,26 +87,19 @@ class FabCircularMenuState extends State<FabCircularMenu>
   void initState() {
     super.initState();
 
-    _animationController =
-        AnimationController(duration: widget.animationDuration, vsync: this);
+    _animationController = AnimationController(duration: widget.animationDuration, vsync: this);
 
-    _scaleCurve = CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.0, 0.4, curve: widget.animationCurve));
-    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(_scaleCurve as Animation<double>)
-          ..addListener(() {
-            setState(() {});
-          });
+    _scaleCurve = CurvedAnimation(parent: _animationController, curve: Interval(0.0, 0.4, curve: widget.animationCurve));
+    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_scaleCurve as Animation<double>)
+      ..addListener(() {
+        setState(() {});
+      });
 
-    _rotateCurve = CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.4, 1.0, curve: widget.animationCurve));
-    _rotateAnimation = Tween<double>(begin: 0.5, end: 1.0)
-        .animate(_rotateCurve as Animation<double>)
-          ..addListener(() {
-            setState(() {});
-          });
+    _rotateCurve = CurvedAnimation(parent: _animationController, curve: Interval(0.4, 1.0, curve: widget.animationCurve));
+    _rotateAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(_rotateCurve as Animation<double>)
+      ..addListener(() {
+        setState(() {});
+      });
   }
 
   @override
@@ -131,7 +125,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
     return Container(
       margin: widget.fabMargin,
       // Removes the default FAB margin
-      transform: Matrix4.translationValues(16.0, 16.0, 0.0),
+      transform: widget.removeDefaultFabMargin ? Matrix4.translationValues(16.0, 16.0, 0.0) : null,
       child: Stack(
         alignment: widget.alignment,
         children: <Widget>[
@@ -156,17 +150,13 @@ class FabCircularMenuState extends State<FabCircularMenu>
                   ),
                   child: _scaleAnimation.value == 1.0
                       ? Transform.rotate(
-                          angle: (2 * pi) *
-                              _rotateAnimation.value *
-                              _directionX *
-                              _directionY,
+                          angle: (2 * pi) * _rotateAnimation.value * _directionX * _directionY,
                           child: Container(
                             child: Stack(
                               alignment: Alignment.center,
                               children: widget.children
                                   .asMap()
-                                  .map((index, child) => MapEntry(index,
-                                      _applyTransformations(child, index)))
+                                  .map((index, child) => MapEntry(index, _applyTransformations(child, index)))
                                   .values
                                   .toList(),
                             ),
@@ -197,9 +187,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
               },
               child: Center(
                 child: widget.fabChild == null
-                    ? (_scaleAnimation.value == 1.0
-                        ? widget.fabCloseIcon
-                        : widget.fabOpenIcon)
+                    ? (_scaleAnimation.value == 1.0 ? widget.fabCloseIcon : widget.fabOpenIcon)
                     : widget.fabChild,
               ),
             ),
@@ -217,18 +205,11 @@ class FabCircularMenuState extends State<FabCircularMenu>
       angleFix = -45.0 * _directionX.abs();
     }
 
-    final angle =
-        vector.radians(90.0 / (widget.children.length - 1) * index + angleFix);
+    final angle = vector.radians(90.0 / (widget.children.length - 1) * index + angleFix);
 
     return Transform(
-        transform: Matrix4.translationValues(
-            (-(_ringDiameter! / 2) * cos(angle) +
-                    (_ringWidth! / 2 * cos(angle))) *
-                _directionX,
-            (-(_ringDiameter! / 2) * sin(angle) +
-                    (_ringWidth! / 2 * sin(angle))) *
-                _directionY,
-            0.0),
+        transform: Matrix4.translationValues((-(_ringDiameter! / 2) * cos(angle) + (_ringWidth! / 2 * cos(angle))) * _directionX,
+            (-(_ringDiameter! / 2) * sin(angle) + (_ringWidth! / 2 * sin(angle))) * _directionY, 0.0),
         alignment: FractionalOffset.center,
         child: Material(
           color: Colors.transparent,
@@ -244,17 +225,14 @@ class FabCircularMenuState extends State<FabCircularMenu>
     _fabIconBorder = widget.fabIconBorder ?? CircleBorder();
     _screenWidth = MediaQuery.of(context).size.width;
     _screenHeight = MediaQuery.of(context).size.height;
-    _ringDiameter =
-        widget.ringDiameter ?? min(_screenWidth, _screenHeight) * 1.25;
+    _ringDiameter = widget.ringDiameter ?? min(_screenWidth, _screenHeight) * 1.25;
     _ringWidth = widget.ringWidth ?? _ringDiameter! * 0.3;
     _marginH = (widget.fabMargin.right + widget.fabMargin.left) / 2;
     _marginV = (widget.fabMargin.top + widget.fabMargin.bottom) / 2;
     _directionX = widget.alignment.x == 0 ? 1 : 1 * widget.alignment.x.sign;
     _directionY = widget.alignment.y == 0 ? 1 : 1 * widget.alignment.y.sign;
-    _translationX =
-        ((_screenWidth - widget.fabSize) / 2 - _marginH) * widget.alignment.x;
-    _translationY =
-        ((_screenHeight - widget.fabSize) / 2 - _marginV) * widget.alignment.y;
+    _translationX = ((_screenWidth - widget.fabSize) / 2 - _marginH) * widget.alignment.x;
+    _translationY = ((_screenHeight - widget.fabSize) / 2 - _marginV) * widget.alignment.y;
 
     if (_colorAnimation == null || !kReleaseMode) {
       _colorCurve = CurvedAnimation(
@@ -264,11 +242,10 @@ class FabCircularMenuState extends State<FabCircularMenu>
             0.4,
             curve: widget.animationCurve,
           ));
-      _colorAnimation = ColorTween(begin: _fabCloseColor, end: _fabOpenColor)
-          .animate(_colorCurve as Animation<double>)
-            ..addListener(() {
-              setState(() {});
-            });
+      _colorAnimation = ColorTween(begin: _fabCloseColor, end: _fabOpenColor).animate(_colorCurve as Animation<double>)
+        ..addListener(() {
+          setState(() {});
+        });
     }
   }
 
@@ -310,13 +287,7 @@ class _RingPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = size.width < width! ? size.width : width!;
 
-    canvas.drawArc(
-        Rect.fromLTWH(
-            width! / 2, width! / 2, size.width - width!, size.height - width!),
-        0.0,
-        2 * pi,
-        false,
-        paint);
+    canvas.drawArc(Rect.fromLTWH(width! / 2, width! / 2, size.width - width!, size.height - width!), 0.0, 2 * pi, false, paint);
   }
 
   @override
