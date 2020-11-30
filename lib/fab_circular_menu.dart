@@ -5,6 +5,50 @@ import 'package:vector_math/vector_math.dart' as vector;
 
 typedef DisplayChange = void Function(bool isOpen);
 
+class FabCircularAnimated {
+  final Color openColor;
+  final Color closeColor;
+  final double size;
+  final AnimatedIconData icon;
+  final String semanticLabel;
+  final TextDirection textDirection;
+
+  const FabCircularAnimated({
+    this.icon = AnimatedIcons.menu_close,
+    this.openColor = Colors.red,
+    this.closeColor = Colors.blue,
+    this.size,
+    this.semanticLabel,
+    this.textDirection,
+  });
+
+}
+
+class FabCircularAnimatedIcon extends StatelessWidget {
+  final FabCircularAnimated fabCircularAnimated;
+  final Animation<double> animationScale;
+  final Animation<Color> animationColor;
+
+  FabCircularAnimatedIcon({
+    @required this.fabCircularAnimated,
+    @required this.animationScale,
+    @required this.animationColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedIcon(
+      icon: this.fabCircularAnimated.icon,
+      progress: animationScale,
+      color: animationColor.value,
+      size: this.fabCircularAnimated.size,
+      key: this.key,
+      semanticLabel: this.fabCircularAnimated.semanticLabel,
+      textDirection: this.fabCircularAnimated.textDirection,
+    );
+  }
+}
+
 class FabCircularMenu extends StatefulWidget {
   final List<Widget> children;
   final Alignment alignment;
@@ -19,6 +63,7 @@ class FabCircularMenu extends StatefulWidget {
   final Widget fabChild;
   final Widget fabOpenIcon;
   final Widget fabCloseIcon;
+  final FabCircularAnimated fabCircularAnimated;
   final ShapeBorder fabIconBorder;
   final EdgeInsets fabMargin;
   final Duration animationDuration;
@@ -40,6 +85,7 @@ class FabCircularMenu extends StatefulWidget {
       this.fabChild,
       this.fabOpenIcon = const Icon(Icons.menu),
       this.fabCloseIcon = const Icon(Icons.close),
+      this.fabCircularAnimated,
       this.fabMargin = const EdgeInsets.all(16.0),
       this.animationDuration = const Duration(milliseconds: 800),
       this.animationCurve = Curves.easeInOutCirc,
@@ -78,6 +124,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   Animation<double> _rotateAnimation;
   Animation _rotateCurve;
   Animation<Color> _colorAnimation;
+  Animation<Color> _textColorAnimatedIcon;
   Animation _colorCurve;
 
   bool _isOpen = false;
@@ -191,9 +238,14 @@ class FabCircularMenuState extends State<FabCircularMenu>
               },
               child: Center(
                   child: widget.fabChild == null
-                      ? (_scaleAnimation.value == 1.0
-                          ? widget.fabCloseIcon
-                          : widget.fabOpenIcon)
+                      ? widget.fabCircularAnimated != null
+                          ? FabCircularAnimatedIcon(
+                              fabCircularAnimated: widget.fabCircularAnimated,
+                              animationScale: _scaleAnimation,
+                              animationColor: _textColorAnimatedIcon)
+                          : (_scaleAnimation.value == 1.0
+                              ? widget.fabCloseIcon
+                              : widget.fabOpenIcon)
                       : widget.fabChild),
             ),
           ),
@@ -254,6 +306,12 @@ class FabCircularMenuState extends State<FabCircularMenu>
           parent: _animationController,
           curve: Interval(0.0, 0.4, curve: widget.animationCurve));
       _colorAnimation = ColorTween(begin: _fabCloseColor, end: _fabOpenColor)
+          .animate(_colorCurve)
+            ..addListener(() {
+              setState(() {});
+            });
+      _textColorAnimatedIcon = ColorTween(
+              begin: widget.fabCircularAnimated?.closeColor, end: widget.fabCircularAnimated?.openColor)
           .animate(_colorCurve)
             ..addListener(() {
               setState(() {});
