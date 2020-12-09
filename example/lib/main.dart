@@ -52,6 +52,12 @@ class MyApp extends StatelessWidget {
             fabColor: Colors.white,
             fabOpenIcon: Icon(Icons.menu, color: primaryColor),
             fabCloseIcon: Icon(Icons.close, color: primaryColor),
+            // If you do not send the fabCircularAnimated, so it will assume fabIcon
+            // fabCircularAnimated: FabCircularAnimated(
+            // default icon: AnimatedIcons.menu_close
+            // default openColor: red
+            // default closeColor: blue
+            // ),
             fabMargin: const EdgeInsets.all(16.0),
             animationDuration: const Duration(milliseconds: 800),
             animationCurve: Curves.easeInOutCirc,
