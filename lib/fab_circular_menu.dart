@@ -1,4 +1,6 @@
 import 'dart:math';
+
+import 'package:fab_circular_menu/stack_with_all_children_receive_events.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vector;
@@ -8,6 +10,13 @@ typedef DisplayChange = void Function(bool isOpen);
 class FabCircularMenu extends StatefulWidget {
   final List<Widget> children;
   final Alignment alignment;
+  final Key buttonKey;
+
+  /// When used as the floatingActionButton in a Scaffold, there is a default margin
+  /// applied that needs to be removed.  If this button is placed manually, this offset
+  /// can cause issues.  Set this value to false to _not_ attempt to remove the default
+  /// FAB margin
+  final bool removeDefaultFabMargin;
   final Color ringColor;
   final double ringDiameter;
   final double ringWidth;
@@ -27,7 +36,8 @@ class FabCircularMenu extends StatefulWidget {
 
   FabCircularMenu(
       {Key key,
-      this.alignment = Alignment.bottomRight,
+      this.buttonKey,
+      this.alignment = Alignment.bottomCenter,
       this.ringColor,
       this.ringDiameter,
       this.ringWidth,
@@ -35,6 +45,7 @@ class FabCircularMenu extends StatefulWidget {
       this.fabElevation = 8.0,
       this.fabColor,
       this.fabOpenColor,
+      this.removeDefaultFabMargin = true,
       this.fabCloseColor,
       this.fabIconBorder,
       this.fabChild,
@@ -128,17 +139,20 @@ class FabCircularMenuState extends State<FabCircularMenu>
     }
 
     return Container(
-      margin: widget.fabMargin,
       // Removes the default FAB margin
-      transform: Matrix4.translationValues(16.0, 16.0, 0.0),
-      child: Stack(
+      transform: widget.removeDefaultFabMargin
+          ? Matrix4.translationValues(16.0, 16.0, 0.0)
+          : null,
+      child: StackWithAllChildrenReceiveEvents(
+        overflow: Overflow.visible,
         alignment: widget.alignment,
         children: <Widget>[
+
           // Ring
           Transform(
             transform:
-                Matrix4.translationValues(_translationX, _translationY, 0.0)
-                  ..scale(_scaleAnimation.value),
+            Matrix4.translationValues(_translationX, _translationY, 0.0)
+              ..scale(_scaleAnimation.value),
             alignment: FractionalOffset.center,
             child: OverflowBox(
               maxWidth: _ringDiameter,
@@ -150,22 +164,22 @@ class FabCircularMenuState extends State<FabCircularMenu>
                   painter: _RingPainter(width: _ringWidth, color: _ringColor),
                   child: _scaleAnimation.value == 1.0
                       ? Transform.rotate(
-                          angle: (2 * pi) *
-                              _rotateAnimation.value *
-                              _directionX *
-                              _directionY,
-                          child: Container(
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: widget.children
-                                  .asMap()
-                                  .map((index, child) => MapEntry(index,
-                                      _applyTransformations(child, index)))
-                                  .values
-                                  .toList(),
-                            ),
-                          ),
-                        )
+                    angle: (2 * pi) *
+                        _rotateAnimation.value *
+                        _directionX *
+                        _directionY,
+                    child: Container(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: widget.children
+                            .asMap()
+                            .map((index, child) => MapEntry(index,
+                            _applyTransformations(child, index)))
+                            .values
+                            .toList(),
+                      ),
+                    ),
+                  )
                       : Container(),
                 ),
               ),
@@ -174,9 +188,11 @@ class FabCircularMenuState extends State<FabCircularMenu>
 
           // FAB
           Container(
+            margin: widget.fabMargin,
             width: widget.fabSize,
             height: widget.fabSize,
             child: RawMaterialButton(
+              key: widget.buttonKey,
               fillColor: _colorAnimation.value,
               shape: _fabIconBorder,
               elevation: widget.fabElevation,
@@ -197,6 +213,9 @@ class FabCircularMenuState extends State<FabCircularMenu>
                       : widget.fabChild),
             ),
           ),
+
+
+
         ],
       ),
     );
