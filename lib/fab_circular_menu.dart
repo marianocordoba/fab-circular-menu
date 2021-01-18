@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:fab_circular_menu/stack_with_all_children_receive_events.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vector;
@@ -37,7 +38,7 @@ class FabCircularMenu extends StatefulWidget {
   FabCircularMenu(
       {Key? key,
       this.buttonKey,
-      this.alignment = Alignment.bottomRight,
+      this.alignment = Alignment.bottomCenter,
       this.ringColor,
       this.ringDiameter,
       this.ringWidth,
@@ -132,10 +133,10 @@ class FabCircularMenuState extends State<FabCircularMenu> with SingleTickerProvi
     }
 
     return Container(
-      margin: widget.fabMargin,
       // Removes the default FAB margin
       transform: widget.removeDefaultFabMargin ? Matrix4.translationValues(16.0, 16.0, 0.0) : null,
-      child: Stack(
+      child: StackWithAllChildrenReceiveEvents(
+        overflow: Overflow.visible,
         alignment: widget.alignment,
         children: <Widget>[
           // Ring
@@ -179,6 +180,7 @@ class FabCircularMenuState extends State<FabCircularMenu> with SingleTickerProvi
 
           // FAB
           Container(
+            margin: widget.fabMargin,
             width: widget.fabSize,
             height: widget.fabSize,
             child: RawMaterialButton(
