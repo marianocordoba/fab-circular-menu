@@ -1,3 +1,7 @@
+## 1.0.2
+* Null safety
+* Changed the children count requirement to 1 from 2
+
 ## 1.0.1
 * Fixes bug with alignment
 * Added the posibility to modify the FAB border
