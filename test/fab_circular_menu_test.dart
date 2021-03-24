@@ -64,16 +64,16 @@ void main () {
 
     expect(isOpen, false);
 
-    fab.currentState.open();
+    fab.currentState!.open();
     await tester.pump();
 
     expect(isOpen, true);
-    expect(fab.currentState.isOpen, true);
+    expect(fab.currentState!.isOpen, true);
 
-    fab.currentState.close();
+    fab.currentState!.close();
     await tester.pump();
 
     expect(isOpen, false);
-    expect(fab.currentState.isOpen, false);
+    expect(fab.currentState!.isOpen, false);
   });
 }
