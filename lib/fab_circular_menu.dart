@@ -45,7 +45,7 @@ class FabCircularMenu extends StatefulWidget {
       this.animationCurve = Curves.easeInOutCirc,
       this.onDisplayChange,
       required this.children})
-      : assert(children.length >= 2),
+      : assert(children.length >= 1),
         super(key: key);
 
   @override
