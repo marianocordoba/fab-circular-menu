@@ -131,7 +131,11 @@ class FabCircularMenuState extends State<FabCircularMenu>
     return Container(
       margin: widget.fabMargin,
       // Removes the default FAB margin
-      transform: Matrix4.translationValues(16.0, 16.0, 0.0),
+      transform: Matrix4.translationValues(
+        16.0 * _directionX,
+        16.0 * _directionY,
+        0.0,
+      ),
       child: Stack(
         alignment: widget.alignment,
         children: <Widget>[
