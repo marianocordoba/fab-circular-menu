@@ -25,27 +25,27 @@ class FabCircularMenu extends StatefulWidget {
   final Curve animationCurve;
   final DisplayChange? onDisplayChange;
 
-  FabCircularMenu(
-      {Key? key,
-      this.alignment = Alignment.bottomRight,
-      this.ringColor,
-      this.ringDiameter,
-      this.ringWidth,
-      this.fabSize = 64.0,
-      this.fabElevation = 8.0,
-      this.fabColor,
-      this.fabOpenColor,
-      this.fabCloseColor,
-      this.fabIconBorder,
-      this.fabChild,
-      this.fabOpenIcon = const Icon(Icons.menu),
-      this.fabCloseIcon = const Icon(Icons.close),
-      this.fabMargin = const EdgeInsets.all(16.0),
-      this.animationDuration = const Duration(milliseconds: 800),
-      this.animationCurve = Curves.easeInOutCirc,
-      this.onDisplayChange,
-      required this.children})
-      : assert(children.length >= 1),
+  FabCircularMenu({
+    Key? key,
+    this.alignment = Alignment.bottomRight,
+    this.ringColor,
+    this.ringDiameter,
+    this.ringWidth,
+    this.fabSize = 64.0,
+    this.fabElevation = 8.0,
+    this.fabColor,
+    this.fabOpenColor,
+    this.fabCloseColor,
+    this.fabIconBorder,
+    this.fabChild,
+    this.fabOpenIcon = const Icon(Icons.menu),
+    this.fabCloseIcon = const Icon(Icons.close),
+    this.fabMargin = const EdgeInsets.all(16.0),
+    this.animationDuration = const Duration(milliseconds: 800),
+    this.animationCurve = Curves.easeInOutCirc,
+    this.onDisplayChange,
+    required this.children,
+  })  : assert(children.isNotEmpty),
         super(key: key);
 
   @override
@@ -90,22 +90,24 @@ class FabCircularMenuState extends State<FabCircularMenu>
         AnimationController(duration: widget.animationDuration, vsync: this);
 
     _scaleCurve = CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.0, 0.4, curve: widget.animationCurve));
+      parent: _animationController,
+      curve: Interval(0.0, 0.4, curve: widget.animationCurve),
+    );
     _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0)
         .animate(_scaleCurve as Animation<double>)
-          ..addListener(() {
-            setState(() {});
-          });
+      ..addListener(() {
+        setState(() {});
+      });
 
     _rotateCurve = CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.4, 1.0, curve: widget.animationCurve));
+      parent: _animationController,
+      curve: Interval(0.4, 1.0, curve: widget.animationCurve),
+    );
     _rotateAnimation = Tween<double>(begin: 0.5, end: 1.0)
         .animate(_rotateCurve as Animation<double>)
-          ..addListener(() {
-            setState(() {});
-          });
+      ..addListener(() {
+        setState(() {});
+      });
   }
 
   @override
@@ -146,7 +148,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
             child: OverflowBox(
               maxWidth: _ringDiameter,
               maxHeight: _ringDiameter,
-              child: Container(
+              child: SizedBox(
                 width: _ringDiameter,
                 height: _ringDiameter,
                 child: CustomPaint(
@@ -160,16 +162,18 @@ class FabCircularMenuState extends State<FabCircularMenu>
                               _rotateAnimation.value *
                               _directionX *
                               _directionY,
-                          child: Container(
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: widget.children
-                                  .asMap()
-                                  .map((index, child) => MapEntry(index,
-                                      _applyTransformations(child, index)))
-                                  .values
-                                  .toList(),
-                            ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: widget.children
+                                .asMap()
+                                .map(
+                                  (index, child) => MapEntry(
+                                    index,
+                                    _applyTransformations(child, index),
+                                  ),
+                                )
+                                .values
+                                .toList(),
                           ),
                         )
                       : Container(),
@@ -179,7 +183,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
           ),
 
           // FAB
-          Container(
+          SizedBox(
             width: widget.fabSize,
             height: widget.fabSize,
             child: RawMaterialButton(
@@ -196,11 +200,10 @@ class FabCircularMenuState extends State<FabCircularMenu>
                 }
               },
               child: Center(
-                child: widget.fabChild == null
-                    ? (_scaleAnimation.value == 1.0
+                child: widget.fabChild ??
+                    (_scaleAnimation.value == 1.0
                         ? widget.fabCloseIcon
-                        : widget.fabOpenIcon)
-                    : widget.fabChild,
+                        : widget.fabOpenIcon),
               ),
             ),
           ),
@@ -221,27 +224,27 @@ class FabCircularMenuState extends State<FabCircularMenu>
         vector.radians(90.0 / (widget.children.length - 1) * index + angleFix);
 
     return Transform(
-        transform: Matrix4.translationValues(
-            (-(_ringDiameter! / 2) * cos(angle) +
-                    (_ringWidth! / 2 * cos(angle))) *
-                _directionX,
-            (-(_ringDiameter! / 2) * sin(angle) +
-                    (_ringWidth! / 2 * sin(angle))) *
-                _directionY,
-            0.0),
-        alignment: FractionalOffset.center,
-        child: Material(
-          color: Colors.transparent,
-          child: child,
-        ));
+      transform: Matrix4.translationValues(
+        (-(_ringDiameter! / 2) * cos(angle) + (_ringWidth! / 2 * cos(angle))) *
+            _directionX,
+        (-(_ringDiameter! / 2) * sin(angle) + (_ringWidth! / 2 * sin(angle))) *
+            _directionY,
+        0.0,
+      ),
+      alignment: FractionalOffset.center,
+      child: Material(
+        color: Colors.transparent,
+        child: child,
+      ),
+    );
   }
 
   void _calculateProps() {
-    _ringColor = widget.ringColor ?? Theme.of(context).accentColor;
+    _ringColor = widget.ringColor ?? Theme.of(context).colorScheme.secondary;
     _fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
     _fabOpenColor = widget.fabOpenColor ?? _fabColor;
     _fabCloseColor = widget.fabCloseColor ?? _fabColor;
-    _fabIconBorder = widget.fabIconBorder ?? CircleBorder();
+    _fabIconBorder = widget.fabIconBorder ?? const CircleBorder();
     _screenWidth = MediaQuery.of(context).size.width;
     _screenHeight = MediaQuery.of(context).size.height;
     _ringDiameter =
@@ -258,17 +261,18 @@ class FabCircularMenuState extends State<FabCircularMenu>
 
     if (_colorAnimation == null || !kReleaseMode) {
       _colorCurve = CurvedAnimation(
-          parent: _animationController,
-          curve: Interval(
-            0.0,
-            0.4,
-            curve: widget.animationCurve,
-          ));
+        parent: _animationController,
+        curve: Interval(
+          0.0,
+          0.4,
+          curve: widget.animationCurve,
+        ),
+      );
       _colorAnimation = ColorTween(begin: _fabCloseColor, end: _fabOpenColor)
           .animate(_colorCurve as Animation<double>)
-            ..addListener(() {
-              setState(() {});
-            });
+        ..addListener(() {
+          setState(() {});
+        });
     }
   }
 
@@ -277,9 +281,8 @@ class FabCircularMenuState extends State<FabCircularMenu>
     _animationController.forward().then((_) {
       _isAnimating = false;
       _isOpen = true;
-      if (widget.onDisplayChange != null) {
-        widget.onDisplayChange!(true);
-      }
+
+      widget.onDisplayChange?.call(true);
     });
   }
 
@@ -288,9 +291,8 @@ class FabCircularMenuState extends State<FabCircularMenu>
     _animationController.reverse().then((_) {
       _isAnimating = false;
       _isOpen = false;
-      if (widget.onDisplayChange != null) {
-        widget.onDisplayChange!(false);
-      }
+
+      widget.onDisplayChange?.call(false);
     });
   }
 
@@ -311,12 +313,17 @@ class _RingPainter extends CustomPainter {
       ..strokeWidth = size.width < width! ? size.width : width!;
 
     canvas.drawArc(
-        Rect.fromLTWH(
-            width! / 2, width! / 2, size.width - width!, size.height - width!),
-        0.0,
-        2 * pi,
-        false,
-        paint);
+      Rect.fromLTWH(
+        width! / 2,
+        width! / 2,
+        size.width - width!,
+        size.height - width!,
+      ),
+      0.0,
+      2 * pi,
+      false,
+      paint,
+    );
   }
 
   @override

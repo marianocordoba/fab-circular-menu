@@ -1,6 +1,6 @@
 name: example
 description: FAB Circular Menu Example
-
+publish_to: none
 version: 1.0.0+1
 
 environment:
@@ -19,5 +19,4 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
-
   uses-material-design: true

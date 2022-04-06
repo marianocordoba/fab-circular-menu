@@ -6,7 +6,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
 
   @override
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
         body: Container(
           color: const Color(0xFF192A56),
           child: Center(
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () {
                 // The menu can be handled programatically using a key
                 if (fabKey.currentState.isOpen) {
@@ -28,8 +27,8 @@ class MyApp extends StatelessWidget {
                   fabKey.currentState.open();
                 }
               },
-              color: Colors.white,
-              child: Text('Toggle menu programatically', style: TextStyle(color: primaryColor)),
+              child: Text('Toggle menu programatically',
+                  style: TextStyle(color: primaryColor)),
             ),
           ),
         ),
@@ -56,7 +55,8 @@ class MyApp extends StatelessWidget {
             animationDuration: const Duration(milliseconds: 800),
             animationCurve: Curves.easeInOutCirc,
             onDisplayChange: (isOpen) {
-              _showSnackBar(context, "The menu is ${isOpen ? "open" : "closed"}");
+              _showSnackBar(
+                  context, "The menu is ${isOpen ? "open" : "closed"}");
             },
             children: <Widget>[
               RawMaterialButton(
@@ -85,7 +85,8 @@ class MyApp extends StatelessWidget {
               ),
               RawMaterialButton(
                 onPressed: () {
-                  _showSnackBar(context, "You pressed 4. This one closes the menu on tap");
+                  _showSnackBar(context,
+                      "You pressed 4. This one closes the menu on tap");
                   fabKey.currentState.close();
                 },
                 shape: CircleBorder(),
@@ -100,12 +101,9 @@ class MyApp extends StatelessWidget {
   }
 
   void _showSnackBar(BuildContext context, String message) {
-    Scaffold.of(context).showSnackBar(
-        SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
       duration: const Duration(milliseconds: 1000),
-        )
-    );
+    ));
   }
-
 }
