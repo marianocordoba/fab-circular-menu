@@ -2,17 +2,15 @@ import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-void main () {
-  testWidgets('Should show it\'s options while opened', (WidgetTester tester) async {
+void main() {
+  testWidgets("Should show it's options while opened",
+      (WidgetTester tester) async {
     final widgetUnderTest = MaterialApp(
       home: Scaffold(
         floatingActionButton: FabCircularMenu(
           alignment: Alignment.bottomCenter,
-          animationDuration: Duration(),
-          children: <Widget>[
-            Icon(Icons.add),
-            Icon(Icons.add)
-          ],
+          animationDuration: Duration.zero,
+          children: const <Widget>[Icon(Icons.add), Icon(Icons.add)],
         ),
       ),
     );
@@ -30,7 +28,9 @@ void main () {
     expect(find.byIcon(Icons.add), findsNWidgets(2));
   });
 
-  testWidgets('Should be able to be opened by tapping the FAB or programatically', (WidgetTester tester) async {
+  testWidgets(
+      'Should be able to be opened by tapping the FAB or programatically',
+      (WidgetTester tester) async {
     final GlobalKey<FabCircularMenuState> fab = GlobalKey();
     bool isOpen = false;
 
@@ -39,14 +39,11 @@ void main () {
         floatingActionButton: FabCircularMenu(
           key: fab,
           alignment: Alignment.centerRight,
-          animationDuration: Duration(),
+          animationDuration: Duration.zero,
           onDisplayChange: (val) {
             isOpen = val;
           },
-          children: <Widget>[
-            Placeholder(),
-            Placeholder()
-          ],
+          children: const <Widget>[Placeholder(), Placeholder()],
         ),
       ),
     );

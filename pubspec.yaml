@@ -4,7 +4,7 @@ homepage: https://github.com/marianocordoba/fab-circular-menu
 version: 1.0.2
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -14,5 +14,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  lint: ^1.8.2
 
 flutter:
