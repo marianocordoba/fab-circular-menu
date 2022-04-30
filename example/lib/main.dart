@@ -6,7 +6,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
 
   @override
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
         body: Container(
           color: const Color(0xFF192A56),
           child: Center(
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () {
                 // The menu can be handled programatically using a key
                 if (fabKey.currentState.isOpen) {
@@ -100,12 +99,9 @@ class MyApp extends StatelessWidget {
   }
 
   void _showSnackBar(BuildContext context, String message) {
-    Scaffold.of(context).showSnackBar(
-        SnackBar(
+    Scaffold.of(context).showSnackBar(SnackBar(
       content: Text(message),
       duration: const Duration(milliseconds: 1000),
-        )
-    );
+    ));
   }
-
 }

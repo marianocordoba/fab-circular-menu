@@ -4,9 +4,8 @@ import 'package:flutter/rendering.dart';
 /// Passes all events to all children of the stack.  The FAB was having issues
 /// where the padding on the button was blocking the circular items on the edge
 class StackWithAllChildrenReceiveEvents extends Stack {
-
   StackWithAllChildrenReceiveEvents({
-    Key key,
+    Key? key,
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
     TextDirection textDirection = TextDirection.ltr,
     StackFit fit = StackFit.loose,
@@ -14,15 +13,14 @@ class StackWithAllChildrenReceiveEvents extends Stack {
     List<Widget> children = const <Widget>[],
     Clip clipBehavior = Clip.hardEdge,
   }) : super(
-    key: key,
-    alignment: alignment,
-    textDirection: textDirection,
-    fit: fit,
-    overflow: overflow,
-    clipBehavior: clipBehavior,
-    children: children,
-  );
-
+          key: key,
+          alignment: alignment,
+          textDirection: textDirection,
+          fit: fit,
+          overflow: overflow,
+          clipBehavior: clipBehavior,
+          children: children,
+        );
 
   @override
   RenderStackWithAllChildrenReceiveEvents createRenderObject(BuildContext context) {
@@ -57,36 +55,35 @@ class StackWithAllChildrenReceiveEvents extends Stack {
     properties.add(EnumProperty<StackFit>('fit', fit));
     properties.add(EnumProperty<Overflow>('overflow', overflow));
   }
-
 }
 
 class RenderStackWithAllChildrenReceiveEvents extends RenderStack {
   RenderStackWithAllChildrenReceiveEvents({
-    List<RenderBox> children,
+    List<RenderBox> children = const [],
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
-    TextDirection textDirection,
+    TextDirection? textDirection,
     StackFit fit = StackFit.loose,
     Clip clipBehavior = Clip.hardEdge,
-  }): super(
-    alignment: alignment,
-    textDirection: textDirection,
-    fit: fit,
-    clipBehavior: clipBehavior,
-  );
+  }) : super(
+          alignment: alignment,
+          textDirection: textDirection,
+          fit: fit,
+          clipBehavior: clipBehavior,
+        );
 
-  bool allCdefaultHitTestChildren(HitTestResult result, { Offset position }) {
+  bool defaultHitTestChildren(HitTestResult result, {required Offset position}) {
     // the x, y parameters have the top left of the node's box as the origin
-    RenderBox child = lastChild;
+    var child = lastChild;
     while (child != null) {
-      final StackParentData childParentData = child.parentData;
-      child.hitTest(result, position: position - childParentData.offset);
+      StackParentData childParentData = child.parentData as StackParentData;
+      child.hitTest(result as BoxHitTestResult, position: position - childParentData.offset);
       child = childParentData.previousSibling;
     }
     return false;
   }
 
   @override
-  bool hitTestChildren(HitTestResult result, { Offset position }) {
-    return allCdefaultHitTestChildren(result, position: position);
+  bool hitTestChildren(HitTestResult result, {required Offset position}) {
+    return defaultHitTestChildren(result, position: position);
   }
 }
