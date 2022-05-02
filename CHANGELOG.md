@@ -1,3 +1,7 @@
+## 1.1.0-dev.0
+
+ - **FEAT**: bumping version.
+
 ## 1.0.2
 * Null safety
 * Changed the children count requirement to 1 from 2
