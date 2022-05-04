@@ -29,7 +29,7 @@ class StackWithAllChildrenReceiveEvents extends Stack {
       alignment: alignment,
       textDirection: textDirection ?? Directionality.of(context),
       fit: fit,
-      clipBehavior: overflow == Overflow.visible ? Clip.none : clipBehavior,
+      clipBehavior: clipBehavior == Overflow.visible ? Clip.none : clipBehavior,
     );
     // return RenderStackWithAllChildrenReceiveEvents(
     //   alignment: alignment,
@@ -46,7 +46,8 @@ class StackWithAllChildrenReceiveEvents extends Stack {
       ..alignment = alignment
       ..textDirection = textDirection ?? Directionality.of(context)
       ..fit = fit
-      ..clipBehavior = overflow == Overflow.visible ? Clip.none : clipBehavior;
+      ..clipBehavior =
+          clipBehavior == Overflow.visible ? Clip.none : clipBehavior;
   }
 
   @override
@@ -58,6 +59,7 @@ class StackWithAllChildrenReceiveEvents extends Stack {
         defaultValue: null));
     properties.add(EnumProperty<StackFit>('fit', fit));
     properties.add(EnumProperty<Overflow>('overflow', overflow));
+    properties.add(EnumProperty<Clip>('clipBehavior', clipBehavior));
   }
 }
 
