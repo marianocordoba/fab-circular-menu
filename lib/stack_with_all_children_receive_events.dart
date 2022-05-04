@@ -23,7 +23,8 @@ class StackWithAllChildrenReceiveEvents extends Stack {
         );
 
   @override
-  RenderStackWithAllChildrenReceiveEvents createRenderObject(BuildContext context) {
+  RenderStackWithAllChildrenReceiveEvents createRenderObject(
+      BuildContext context) {
     return RenderStackWithAllChildrenReceiveEvents(
       alignment: alignment,
       textDirection: textDirection ?? Directionality.of(context),
@@ -39,7 +40,8 @@ class StackWithAllChildrenReceiveEvents extends Stack {
   }
 
   @override
-  void updateRenderObject(BuildContext context, RenderStackWithAllChildrenReceiveEvents renderObject) {
+  void updateRenderObject(BuildContext context,
+      RenderStackWithAllChildrenReceiveEvents renderObject) {
     renderObject
       ..alignment = alignment
       ..textDirection = textDirection ?? Directionality.of(context)
@@ -50,8 +52,10 @@ class StackWithAllChildrenReceiveEvents extends Stack {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<AlignmentGeometry>('alignment', alignment));
-    properties.add(EnumProperty<TextDirection>('textDirection', textDirection, defaultValue: null));
+    properties
+        .add(DiagnosticsProperty<AlignmentGeometry>('alignment', alignment));
+    properties.add(EnumProperty<TextDirection>('textDirection', textDirection,
+        defaultValue: null));
     properties.add(EnumProperty<StackFit>('fit', fit));
     properties.add(EnumProperty<Overflow>('overflow', overflow));
   }
@@ -71,12 +75,15 @@ class RenderStackWithAllChildrenReceiveEvents extends RenderStack {
           clipBehavior: clipBehavior,
         );
 
-  bool defaultHitTestChildren(HitTestResult result, {required Offset position}) {
+  @override
+  bool defaultHitTestChildren(HitTestResult result,
+      {required Offset position}) {
     // the x, y parameters have the top left of the node's box as the origin
     var child = lastChild;
     while (child != null) {
       StackParentData childParentData = child.parentData as StackParentData;
-      child.hitTest(result as BoxHitTestResult, position: position - childParentData.offset);
+      child.hitTest(result as BoxHitTestResult,
+          position: position - childParentData.offset);
       child = childParentData.previousSibling;
     }
     return false;

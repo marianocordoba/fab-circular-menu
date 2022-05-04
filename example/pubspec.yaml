@@ -1,23 +1,17 @@
-name: example
-description: FAB Circular Menu Example
-
+name: fab_circular_menu_example
 version: 1.0.0+1
-
-environment:
-  sdk: ">=2.1.0 <3.0.0"
-
-dependencies:
-  flutter:
+description: FAB Circular Menu Example
+environment: 
+  sdk: '>=2.15.0 <3.0.0'
+dependencies: 
+  cupertino_icons: ^1.0.4
+  flutter: 
     sdk: flutter
-
-  cupertino_icons: ^0.1.2
-  fab_circular_menu:
-    path: ../
-
-dev_dependencies:
-  flutter_test:
+  fab_circular_menu: 
+    hosted: https://dart.cloudsmith.io/edspuzzles/edspuzzle-public/
+    version: ^1.1.0
+dev_dependencies: 
+  flutter_test: 
     sdk: flutter
-
-flutter:
-
+flutter: 
   uses-material-design: true
