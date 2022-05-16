@@ -9,7 +9,6 @@ class StackWithAllChildrenReceiveEvents extends Stack {
     AlignmentGeometry alignment = AlignmentDirectional.topStart,
     TextDirection textDirection = TextDirection.ltr,
     StackFit fit = StackFit.loose,
-    Overflow overflow = Overflow.clip,
     List<Widget> children = const <Widget>[],
     Clip clipBehavior = Clip.hardEdge,
   }) : super(
@@ -17,7 +16,6 @@ class StackWithAllChildrenReceiveEvents extends Stack {
           alignment: alignment,
           textDirection: textDirection,
           fit: fit,
-          overflow: overflow,
           clipBehavior: clipBehavior,
           children: children,
         );
@@ -29,7 +27,7 @@ class StackWithAllChildrenReceiveEvents extends Stack {
       alignment: alignment,
       textDirection: textDirection ?? Directionality.of(context),
       fit: fit,
-      clipBehavior: clipBehavior == Overflow.visible ? Clip.none : clipBehavior,
+      clipBehavior: clipBehavior,
     );
     // return RenderStackWithAllChildrenReceiveEvents(
     //   alignment: alignment,
@@ -46,8 +44,7 @@ class StackWithAllChildrenReceiveEvents extends Stack {
       ..alignment = alignment
       ..textDirection = textDirection ?? Directionality.of(context)
       ..fit = fit
-      ..clipBehavior =
-          clipBehavior == Overflow.visible ? Clip.none : clipBehavior;
+      ..clipBehavior = clipBehavior;
   }
 
   @override
@@ -58,7 +55,6 @@ class StackWithAllChildrenReceiveEvents extends Stack {
     properties.add(EnumProperty<TextDirection>('textDirection', textDirection,
         defaultValue: null));
     properties.add(EnumProperty<StackFit>('fit', fit));
-    properties.add(EnumProperty<Overflow>('overflow', overflow));
     properties.add(EnumProperty<Clip>('clipBehavior', clipBehavior));
   }
 }

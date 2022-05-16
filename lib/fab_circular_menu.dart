@@ -155,7 +155,6 @@ class FabCircularMenuState extends State<FabCircularMenu>
           ? Matrix4.translationValues(16.0, 16.0, 0.0)
           : null,
       child: StackWithAllChildrenReceiveEvents(
-        overflow: Overflow.visible,
         alignment: widget.alignment,
         children: <Widget>[
           // Ring

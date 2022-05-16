@@ -8,8 +8,7 @@ dependencies:
   flutter: 
     sdk: flutter
   fab_circular_menu: 
-    hosted: https://dart.cloudsmith.io/edspuzzles/edspuzzle-public/
-    version: ^1.1.0
+    path: /Users/ericm/sunny/player_rank/packages/fab_circular_menu
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
