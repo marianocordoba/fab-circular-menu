@@ -53,7 +53,7 @@ class FabCircularMenu extends StatefulWidget {
 }
 
 class FabCircularMenuState extends State<FabCircularMenu>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late double _screenWidth;
   late double _screenHeight;
   late double _marginH;
@@ -85,6 +85,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     _animationController =
         AnimationController(duration: widget.animationDuration, vsync: this);
@@ -111,7 +112,16 @@ class FabCircularMenuState extends State<FabCircularMenu>
   @override
   void dispose() {
     _animationController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    _calculateProps();
+    if (isOpen) {
+      close();
+    }
   }
 
   @override
@@ -131,29 +141,28 @@ class FabCircularMenuState extends State<FabCircularMenu>
     return Container(
       margin: widget.fabMargin,
       // Removes the default FAB margin
-      transform: Matrix4.translationValues(16.0, 16.0, 0.0),
+      transform: Matrix4.translationValues(
+        16.0 * _directionX,
+        16.0 * _directionY,
+        0.0,
+      ),
       child: Stack(
         alignment: widget.alignment,
         children: <Widget>[
           // Ring
-          Transform(
-            transform: Matrix4.translationValues(
-              _translationX,
-              _translationY,
-              0.0,
-            )..scale(_scaleAnimation.value),
-            alignment: FractionalOffset.center,
-            child: OverflowBox(
-              maxWidth: _ringDiameter,
-              maxHeight: _ringDiameter,
+          OverflowBox(
+            maxWidth: _ringDiameter,
+            maxHeight: _ringDiameter,
+            child: Transform(
+              transform:
+                  Matrix4.translationValues(_translationX, _translationY, 0.0)
+                    ..scale(_scaleAnimation.value),
+              alignment: FractionalOffset.center,
               child: Container(
                 width: _ringDiameter,
                 height: _ringDiameter,
                 child: CustomPaint(
-                  painter: _RingPainter(
-                    width: _ringWidth,
-                    color: _ringColor,
-                  ),
+                  painter: _RingPainter(width: _ringWidth, color: _ringColor),
                   child: _scaleAnimation.value == 1.0
                       ? Transform.rotate(
                           angle: (2 * pi) *
