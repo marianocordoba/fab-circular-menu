@@ -53,7 +53,7 @@ class FabCircularMenu extends StatefulWidget {
 }
 
 class FabCircularMenuState extends State<FabCircularMenu>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late double _screenWidth;
   late double _screenHeight;
   late double _marginH;
@@ -85,6 +85,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     _animationController =
         AnimationController(duration: widget.animationDuration, vsync: this);
@@ -111,7 +112,16 @@ class FabCircularMenuState extends State<FabCircularMenu>
   @override
   void dispose() {
     _animationController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    _calculateProps();
+    if (isOpen) {
+      close();
+    }
   }
 
   @override
