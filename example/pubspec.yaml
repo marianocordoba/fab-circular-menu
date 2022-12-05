@@ -4,11 +4,11 @@ description: FAB Circular Menu Example
 environment: 
   sdk: '>=2.15.0 <3.0.0'
 dependencies: 
-  cupertino_icons: ^1.0.4
+  cupertino_icons: ^1.0.5
   flutter: 
     sdk: flutter
   fab_circular_menu: 
-    path: /Users/ericm/sunny/player_rank/packages/fab_circular_menu
+    path: /Users/ericm/sunny/local_plugins/fab_circular_menu
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
