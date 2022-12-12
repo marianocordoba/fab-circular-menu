@@ -155,7 +155,6 @@ class FabCircularMenuState extends State<FabCircularMenu>
           ? Matrix4.translationValues(16.0, 16.0, 0.0)
           : null,
       child: StackWithAllChildrenReceiveEvents(
-        overflow: Overflow.visible,
         alignment: widget.alignment,
         children: <Widget>[
           // Ring
@@ -271,7 +270,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   }
 
   void _calculateProps() {
-    _ringColor = widget.ringColor ?? Theme.of(context).accentColor;
+    _ringColor = widget.ringColor ?? Theme.of(context).colorScheme.secondary;
     _fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
     _fabOpenColor = widget.fabOpenColor ?? _fabColor;
     _fabCloseColor = widget.fabCloseColor ?? _fabColor;

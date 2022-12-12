@@ -42,13 +42,13 @@ packages:
       name: cupertino_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.4"
+    version: "1.0.5"
   fab_circular_menu:
     dependency: "direct main"
     description:
-      name: fab_circular_menu
-      url: "https://dart.cloudsmith.io/edspuzzles/edspuzzle-public/"
-    source: hosted
+      path: "/Users/ericm/sunny/local_plugins/fab_circular_menu"
+      relative: false
+    source: path
     version: "1.1.0"
   fake_async:
     dependency: transitive
