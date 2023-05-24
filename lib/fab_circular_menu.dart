@@ -150,6 +150,8 @@ class FabCircularMenuState extends State<FabCircularMenu>
     }
 
     return Container(
+      height: _screenHeight,
+      width: _screenWidth,
       // Removes the default FAB margin
       transform: widget.removeDefaultFabMargin
           ? Matrix4.translationValues(16.0, 16.0, 0.0)
