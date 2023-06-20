@@ -1,3 +1,41 @@
+## 1.1.0
+
+ - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.
+
+## 1.1.0-dev.6
+
+ - **FEAT**: Cleaning up for melos publish.
+ - **FEAT**: bumping version.
+
+## 1.1.0-dev.5
+
+ - **FEAT**: Cleaning up for melos publish.
+ - **FEAT**: bumping version.
+
+## 1.1.0-dev.4
+
+ - **FEAT**: Cleaning up for melos publish.
+ - **FEAT**: bumping version.
+
+## 1.1.0-dev.3
+
+ - **FEAT**: Cleaning up for melos publish.
+ - **FEAT**: bumping version.
+
+## 1.1.0-dev.2
+
+ - **FEAT**: Cleaning up for melos publish.
+ - **FEAT**: bumping version.
+
+## 1.1.0-dev.1
+
+ - **FEAT**: Cleaning up for melos publish.
+ - **FEAT**: bumping version.
+
+## 1.1.0-dev.0
+
+ - **FEAT**: bumping version.
+
 ## 1.0.2
 * Null safety
 * Changed the children count requirement to 1 from 2

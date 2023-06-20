@@ -1,4 +1,6 @@
 import 'dart:math';
+
+import 'package:fab_circular_menu/stack_with_all_children_receive_events.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vector;
@@ -6,11 +8,20 @@ import 'package:vector_math/vector_math.dart' as vector;
 typedef DisplayChange = void Function(bool isOpen);
 
 class FabCircularMenu extends StatefulWidget {
+  /// When used as the floatingActionButton in a Scaffold, there is a default margin
+  /// applied that needs to be removed.  If this button is placed manually, this offset
+  /// can cause issues.  Set this value to false to _not_ attempt to remove the default
+  /// FAB margin
+  final bool removeDefaultFabMargin;
+
   final List<Widget> children;
   final Alignment alignment;
   final Color? ringColor;
   final double? ringDiameter;
   final double? ringWidth;
+  final Key? buttonKey;
+  final double rangeStartOffset;
+  final double rangeEndOffset;
   final double fabSize;
   final double fabElevation;
   final Color? fabColor;
@@ -21,22 +32,32 @@ class FabCircularMenu extends StatefulWidget {
   final Widget fabCloseIcon;
   final ShapeBorder? fabIconBorder;
   final EdgeInsets fabMargin;
+  final Offset menuOffset;
   final Duration animationDuration;
   final Curve animationCurve;
   final DisplayChange? onDisplayChange;
 
+  /// Disables the menu from appearing, in favor of a simple onTap handler
+  final VoidCallback? onFabTap;
+
   FabCircularMenu(
       {Key? key,
-      this.alignment = Alignment.bottomRight,
+      this.buttonKey,
+      this.alignment = Alignment.bottomCenter,
       this.ringColor,
       this.ringDiameter,
       this.ringWidth,
+      this.onFabTap,
       this.fabSize = 64.0,
+      this.menuOffset = Offset.zero,
       this.fabElevation = 8.0,
       this.fabColor,
       this.fabOpenColor,
+      this.removeDefaultFabMargin = true,
       this.fabCloseColor,
       this.fabIconBorder,
+      this.rangeStartOffset = 0.0,
+      this.rangeEndOffset = 0.0,
       this.fabChild,
       this.fabOpenIcon = const Icon(Icons.menu),
       this.fabCloseIcon = const Icon(Icons.close),
@@ -94,18 +115,18 @@ class FabCircularMenuState extends State<FabCircularMenu>
         curve: Interval(0.0, 0.4, curve: widget.animationCurve));
     _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0)
         .animate(_scaleCurve as Animation<double>)
-          ..addListener(() {
-            setState(() {});
-          });
+      ..addListener(() {
+        setState(() {});
+      });
 
     _rotateCurve = CurvedAnimation(
         parent: _animationController,
         curve: Interval(0.4, 1.0, curve: widget.animationCurve));
     _rotateAnimation = Tween<double>(begin: 0.5, end: 1.0)
         .animate(_rotateCurve as Animation<double>)
-          ..addListener(() {
-            setState(() {});
-          });
+      ..addListener(() {
+        setState(() {});
+      });
   }
 
   @override
@@ -129,10 +150,13 @@ class FabCircularMenuState extends State<FabCircularMenu>
     }
 
     return Container(
-      margin: widget.fabMargin,
+      height: _screenHeight,
+      width: _screenWidth,
       // Removes the default FAB margin
-      transform: Matrix4.translationValues(16.0, 16.0, 0.0),
-      child: Stack(
+      transform: widget.removeDefaultFabMargin
+          ? Matrix4.translationValues(16.0, 16.0, 0.0)
+          : null,
+      child: StackWithAllChildrenReceiveEvents(
         alignment: widget.alignment,
         children: <Widget>[
           // Ring
@@ -180,19 +204,26 @@ class FabCircularMenuState extends State<FabCircularMenu>
 
           // FAB
           Container(
+            margin: widget.fabMargin,
             width: widget.fabSize,
             height: widget.fabSize,
             child: RawMaterialButton(
+              key: widget.buttonKey,
               fillColor: _colorAnimation!.value,
               shape: _fabIconBorder,
               elevation: widget.fabElevation,
               onPressed: () {
-                if (_isAnimating) return;
-
-                if (_isOpen) {
-                  close();
+                if (widget.onFabTap != null) {
+                  widget.onFabTap!();
+                  return;
                 } else {
-                  open();
+                  if (_isAnimating) return;
+
+                  if (_isOpen) {
+                    close();
+                  } else {
+                    open();
+                  }
                 }
               },
               child: Center(
@@ -216,9 +247,13 @@ class FabCircularMenuState extends State<FabCircularMenu>
     } else if (widget.alignment.y == 0) {
       angleFix = -45.0 * _directionX.abs();
     }
+    angleFix += widget.rangeStartOffset;
 
-    final angle =
-        vector.radians(90.0 / (widget.children.length - 1) * index + angleFix);
+    final angle = vector.radians(
+        (90.0 - widget.rangeStartOffset - widget.rangeEndOffset) /
+                (widget.children.length - 1) *
+                index +
+            angleFix);
 
     return Transform(
         transform: Matrix4.translationValues(
@@ -237,7 +272,7 @@ class FabCircularMenuState extends State<FabCircularMenu>
   }
 
   void _calculateProps() {
-    _ringColor = widget.ringColor ?? Theme.of(context).accentColor;
+    _ringColor = widget.ringColor ?? Theme.of(context).colorScheme.secondary;
     _fabColor = widget.fabColor ?? Theme.of(context).primaryColor;
     _fabOpenColor = widget.fabOpenColor ?? _fabColor;
     _fabCloseColor = widget.fabCloseColor ?? _fabColor;
@@ -251,10 +286,12 @@ class FabCircularMenuState extends State<FabCircularMenu>
     _marginV = (widget.fabMargin.top + widget.fabMargin.bottom) / 2;
     _directionX = widget.alignment.x == 0 ? 1 : 1 * widget.alignment.x.sign;
     _directionY = widget.alignment.y == 0 ? 1 : 1 * widget.alignment.y.sign;
-    _translationX =
-        ((_screenWidth - widget.fabSize) / 2 - _marginH) * widget.alignment.x;
-    _translationY =
-        ((_screenHeight - widget.fabSize) / 2 - _marginV) * widget.alignment.y;
+    _translationX = (((_screenWidth - widget.fabSize) / 2 - _marginH) *
+            widget.alignment.x) +
+        widget.menuOffset.dx;
+    _translationY = (((_screenHeight - widget.fabSize) / 2 - _marginV) *
+            widget.alignment.y) +
+        widget.menuOffset.dy;
 
     if (_colorAnimation == null || !kReleaseMode) {
       _colorCurve = CurvedAnimation(
@@ -266,9 +303,9 @@ class FabCircularMenuState extends State<FabCircularMenu>
           ));
       _colorAnimation = ColorTween(begin: _fabCloseColor, end: _fabOpenColor)
           .animate(_colorCurve as Animation<double>)
-            ..addListener(() {
-              setState(() {});
-            });
+        ..addListener(() {
+          setState(() {});
+        });
     }
   }
 
@@ -301,7 +338,10 @@ class _RingPainter extends CustomPainter {
   final double? width;
   final Color? color;
 
-  _RingPainter({required this.width, this.color});
+  _RingPainter({
+    required this.width,
+    this.color,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -311,12 +351,13 @@ class _RingPainter extends CustomPainter {
       ..strokeWidth = size.width < width! ? size.width : width!;
 
     canvas.drawArc(
-        Rect.fromLTWH(
-            width! / 2, width! / 2, size.width - width!, size.height - width!),
-        0.0,
-        2 * pi,
-        false,
-        paint);
+      Rect.fromLTWH(
+          width! / 2, width! / 2, size.width - width!, size.height - width!),
+      0.0,
+      2 * pi,
+      false,
+      paint,
+    );
   }
 
   @override
